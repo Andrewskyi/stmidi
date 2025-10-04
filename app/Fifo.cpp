@@ -1,5 +1,5 @@
 /*
- * TxFifo.h
+ * TxFifo.cpp
  *
  *  Created on: 04.01.2020
  *      Author: apaluch
@@ -27,33 +27,58 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#ifndef _TX_FIFO_H_
-#define _TX_FIFO_H_
+#include <Fifo.h>
 
-#include <stdint.h>
+Fifo::Fifo(char*const buf, const uint32_t length, Fifo_writeByteFunc writeFuncParam) :
+        overflow(_overflow),
+		writeFunc(writeFuncParam),
+		queue(buf), FIFO_LENGTH(length),
+		writePos(0), readPos(0), fifoLen(0) {
 
-typedef bool (*TxFifo_sendByte)(char byte);
+}
 
-class TxFifo {
-public:
-	volatile const bool& overflow;
+Fifo::~Fifo() {
+}
 
-	TxFifo(char*const buf, const uint32_t length, TxFifo_sendByte sendFunc);
-	virtual ~TxFifo();
+bool Fifo::write(const char* buf, uint32_t length) {
 
-	bool send(const char* buf, uint32_t length);
-	void tick();
-protected:
-	TxFifo_sendByte sendFunc;
-private:
-	char*const queue;
-	const uint32_t FIFO_LENGTH;
-	volatile uint32_t writePos;
-	volatile uint32_t readPos;
-protected:
-	volatile uint32_t fifoLen;
-private:
-	volatile bool _overflow;
-};
+	if ((fifoLen + length) <= FIFO_LENGTH) {
+		for (uint32_t i = 0; i < length; i++) {
+			queue[writePos] = buf[i];
 
-#endif /* _TX_FIFO_H_ */
+			if (writePos < (FIFO_LENGTH - 1)) {
+				writePos++;
+			} else {
+				writePos = 0;
+			}
+		}
+
+		fifoLen += length;
+		tick();
+
+		_overflow = false;
+
+		return true;
+	}
+
+	_overflow = true;
+
+
+	return false;
+}
+
+void Fifo::tick() {
+	if (fifoLen == 0) {
+		return;
+	}
+
+	if (writeFunc(queue[readPos])) {
+		if (readPos < (FIFO_LENGTH - 1)) {
+			readPos++;
+		} else {
+			readPos = 0;
+		}
+
+		fifoLen--;
+	}
+}

@@ -58,7 +58,7 @@ extern "C" {
 #define MIDI_DATA_FS_MAX_PACKET_SIZE                 64U  /* Endpoint IN & OUT Packet size */
 #define MIDI_CMD_PACKET_SIZE                         8U  /* Control Endpoint Packet size */
 
-#define USB_MIDI_CONFIG_DESC_SIZ                     67U
+#define USB_MIDI_CONFIG_DESC_SIZ                     101U
 #define MIDI_DATA_HS_IN_PACKET_SIZE                  MIDI_DATA_HS_MAX_PACKET_SIZE
 #define MIDI_DATA_HS_OUT_PACKET_SIZE                 MIDI_DATA_HS_MAX_PACKET_SIZE
 

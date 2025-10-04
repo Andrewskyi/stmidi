@@ -34,8 +34,8 @@
 #include "usb_device.h"
 #include "usbd_core.h"
 #include "usbd_desc.h"
-#include "usbd_midi.h"
-#include "usbd_midi_if.h"
+#include "usb/usbd_midi.h"
+#include "usb/usbd_midi_if.h"
 
 /* USER CODE END Includes */
 

@@ -30,13 +30,13 @@ SOFTWARE.
 #ifndef _SYSTEM_OUT_H_
 #define _SYSTEM_OUT_H_
 
-#include "TxFifo.h"
+#include <Fifo.h>
 
 #define SystemOut_BUFFER_LENGTH 32
 
-class SystemOut : public TxFifo {
+class SystemOut : public Fifo {
 public:
-	SystemOut(TxFifo_sendByte sendFunc);
+	SystemOut(Fifo_writeByteFunc sendFunc);
 	virtual ~SystemOut();
 private:
 	char buffer[SystemOut_BUFFER_LENGTH];

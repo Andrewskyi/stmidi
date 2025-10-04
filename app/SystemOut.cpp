@@ -29,8 +29,8 @@ SOFTWARE.
 
 #include "SystemOut.h"
 
-SystemOut::SystemOut(TxFifo_sendByte sendFunc) :
-	TxFifo(buffer, SystemOut_BUFFER_LENGTH, sendFunc)
+SystemOut::SystemOut(Fifo_writeByteFunc sendFunc) :
+	Fifo(buffer, SystemOut_BUFFER_LENGTH, sendFunc)
 {
 
 }
