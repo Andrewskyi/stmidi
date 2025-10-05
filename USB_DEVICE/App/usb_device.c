@@ -33,7 +33,7 @@
 
 #include "usb_device.h"
 #include "usbd_core.h"
-#include "usbd_desc.h"
+#include "usb/usbd_midi_desc.h"
 #include "usb/usbd_midi.h"
 #include "usb/usbd_midi_if.h"
 
@@ -98,7 +98,7 @@ void MX_USB_DEVICE_Init(void)
   /* USER CODE BEGIN USB_DEVICE_Init_PostTreatment */
 #endif
 
-  if (USBD_Init(&hUsbDeviceFS, &FS_Desc, DEVICE_FS) != USBD_OK)
+  if (USBD_Init(&hUsbDeviceFS, &FS_MidiDesc, DEVICE_FS) != USBD_OK)
 	{
 	  Error_Handler();
 	}
