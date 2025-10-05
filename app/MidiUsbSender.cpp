@@ -5,49 +5,49 @@
  *      Author: apaluch
  */
 
-#include <UsbMidiSender.h>
+#include <MidiUsbSender.h>
 
-UsbMidiSender::UsbMidiSender(Fifo_writeByteFunc<USB_MIDI_EventPacket_t> writeFunc) :
-	fifo(buf, UsbMidiSender_BUF_LEN, writeFunc)
+MidiUsbSender::MidiUsbSender(Fifo_writeElementFunc<UsbMidiEventPacket> writeFunc) :
+	fifo(buf, MidiUsbSender_BUF_LEN, writeFunc)
 {
 
 }
 
-UsbMidiSender::~UsbMidiSender()
+MidiUsbSender::~MidiUsbSender()
 {
 
 }
 
-bool UsbMidiSender::sendMidi(const uint8_t* buf, uint32_t length)
+bool MidiUsbSender::sendMidi(const uint8_t* buf, uint32_t length)
 {
-	USB_MIDI_EventPacket_t package = UsbMidiSender::midiToUSB(0, buf, length);
+	UsbMidiEventPacket package = MidiUsbSender::midiToUSB(0, buf, length);
 
 	return fifo.write(&package, 1);
 }
 
-bool UsbMidiSender::sendRealTimeMidi(uint8_t b)
+bool MidiUsbSender::sendRealTimeMidi(uint8_t b)
 {
-	USB_MIDI_EventPacket_t package = UsbMidiSender::midiToUSB(0, &b, 1);
+	UsbMidiEventPacket package = MidiUsbSender::midiToUSB(0, &b, 1);
 
 	return fifo.write(&package, 1);
 }
 
-bool UsbMidiSender::sendMidi(uint8_t b1, uint8_t b2, uint8_t b3)
+bool MidiUsbSender::sendMidi(uint8_t b1, uint8_t b2, uint8_t b3)
 {
 	uint8_t buf2[3] = { b1, b2, b3 };
 
 	return sendMidi(buf2, 3);
 }
 
-void UsbMidiSender::tick()
+void MidiUsbSender::tick()
 {
 	fifo.tick();
 }
 
 /* Generate USB-MIDI packet from 1–3 byte MIDI message */
-USB_MIDI_EventPacket_t UsbMidiSender::midiToUSB(uint8_t virtualCable, const uint8_t *midiMsg, uint8_t length)
+UsbMidiEventPacket MidiUsbSender::midiToUSB(uint8_t virtualCable, const uint8_t *midiMsg, uint8_t length)
 {
-    USB_MIDI_EventPacket_t packet = {0};
+    UsbMidiEventPacket packet = {0};
 
     uint8_t status = midiMsg[0];
     uint8_t cin = 0;

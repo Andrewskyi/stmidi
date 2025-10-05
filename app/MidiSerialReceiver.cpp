@@ -27,18 +27,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#include "MidiReceiver.h"
+#include <MidiSerialReceiver.h>
 #include <stdio.h>
 
-MidiReceiver::MidiReceiver(MIDI_recByteFunc recFunc, MidiSender* midiThru) :
+MidiSerialReceiver::MidiSerialReceiver(MIDI_recByteFunc recFunc, MidiSender* midiThru) :
 		recFunc(recFunc), midiThru(midiThru), runningStatusByte(0), bytesCount(
 				0), systemRealTimeEvent(0) {
 }
 
-MidiReceiver::~MidiReceiver() {
+MidiSerialReceiver::~MidiSerialReceiver() {
 }
 
-bool MidiReceiver::nextEvent(uint8_t& b1, uint8_t& b2, uint8_t& b3) {
+bool MidiSerialReceiver::nextEvent(uint8_t& b1, uint8_t& b2, uint8_t& b3) {
 	uint8_t b;
 
 	if (recFunc(b)) {
@@ -138,11 +138,11 @@ bool MidiReceiver::nextEvent(uint8_t& b1, uint8_t& b2, uint8_t& b3) {
 	return false;
 }
 
-void MidiReceiver::tick() {
+void MidiSerialReceiver::tick() {
 	trySendSystemRealtime();
 }
 
-uint32_t MidiReceiver::expectedChannelVoiceMsgBytesCount() {
+uint32_t MidiSerialReceiver::expectedChannelVoiceMsgBytesCount() {
 	switch (runningStatusByte & 0xF0) {
 	case 0xC0:
 	case 0xD0:
@@ -152,7 +152,7 @@ uint32_t MidiReceiver::expectedChannelVoiceMsgBytesCount() {
 	}
 }
 
-void MidiReceiver::trySendSystemRealtime() {
+void MidiSerialReceiver::trySendSystemRealtime() {
 	if (systemRealTimeEvent) {
 		if (midiThru) {
 			if (midiThru->sendRealTimeMidi(systemRealTimeEvent)) {

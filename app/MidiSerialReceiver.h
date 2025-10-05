@@ -27,18 +27,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#ifndef MIDIRECEIVER_H_
-#define MIDIRECEIVER_H_
+#ifndef MIDISERIALRECEIVER_H_
+#define MIDISERIALRECEIVER_H_
 
 #include <stdint.h>
 #include <MidiSender.h>
 
 typedef bool (*MIDI_recByteFunc)(uint8_t& b);
 
-class MidiReceiver {
+class MidiSerialReceiver {
 public:
-	MidiReceiver(MIDI_recByteFunc recFunc, MidiSender* midiThru);
-	virtual ~MidiReceiver();
+	MidiSerialReceiver(MIDI_recByteFunc recFunc, MidiSender* midiThru);
+	virtual ~MidiSerialReceiver();
 
 	bool nextEvent(uint8_t& b1, uint8_t& b2, uint8_t& b3);
 	void tick();
@@ -55,4 +55,4 @@ private:
 	void trySendSystemRealtime();
 };
 
-#endif /* MIDIRECEIVER_H_ */
+#endif /* MIDISERIALRECEIVER_H_ */

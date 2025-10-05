@@ -36,7 +36,7 @@ SOFTWARE.
 
 class SystemOut : public Fifo<char> {
 public:
-	SystemOut(Fifo_writeByteFunc<char> sendFunc);
+	SystemOut(Fifo_writeElementFunc<char> sendFunc);
 	virtual ~SystemOut();
 private:
 	char buffer[SystemOut_BUFFER_LENGTH];

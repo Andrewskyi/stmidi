@@ -29,7 +29,7 @@ SOFTWARE.
 
 #include "SystemOut.h"
 
-SystemOut::SystemOut(Fifo_writeByteFunc<char> sendFunc) :
+SystemOut::SystemOut(Fifo_writeElementFunc<char> sendFunc) :
 	Fifo(buffer, SystemOut_BUFFER_LENGTH, sendFunc)
 {
 

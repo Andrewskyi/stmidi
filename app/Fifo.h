@@ -31,24 +31,20 @@ SOFTWARE.
 #define __FIFO_H_
 
 #include <stdint.h>
-
-//typedef bool (*Fifo_writeByteFunc)(char byte);
-
-template <typename T>
-using Fifo_writeByteFunc = bool(*)(T element);
+#include <FifoWriteElementFunc.h>
 
 template <typename T>
 class Fifo {
 public:
 	volatile const bool& overflow;
 
-	Fifo(T*const buf, const uint32_t length, Fifo_writeByteFunc<T> writeFunc);
+	Fifo(T*const buf, const uint32_t length, Fifo_writeElementFunc<T> writeFunc);
 	virtual ~Fifo();
 
 	bool write(const T* buf, uint32_t length);
 	void tick();
 protected:
-	Fifo_writeByteFunc<T> writeFunc;
+	Fifo_writeElementFunc<T> writeFunc;
 private:
 	T*const queue;
 	const uint32_t FIFO_LENGTH;
@@ -57,11 +53,11 @@ private:
 protected:
 	volatile uint32_t fifoLen;
 private:
-	volatile bool _overflow;
+	volatile bool _overflow = false;
 };
 
 template <typename T>
-Fifo<T>::Fifo(T*const buf, const uint32_t length, Fifo_writeByteFunc<T> writeFuncParam) :
+Fifo<T>::Fifo(T*const buf, const uint32_t length, Fifo_writeElementFunc<T> writeFuncParam) :
         overflow(_overflow),
 		writeFunc(writeFuncParam),
 		queue(buf), FIFO_LENGTH(length),
