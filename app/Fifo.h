@@ -32,21 +32,25 @@ SOFTWARE.
 
 #include <stdint.h>
 
-typedef bool (*Fifo_writeByteFunc)(char byte);
+//typedef bool (*Fifo_writeByteFunc)(char byte);
 
+template <typename T>
+using Fifo_writeByteFunc = bool(*)(T element);
+
+template <typename T>
 class Fifo {
 public:
 	volatile const bool& overflow;
 
-	Fifo(char*const buf, const uint32_t length, Fifo_writeByteFunc writeFunc);
+	Fifo(T*const buf, const uint32_t length, Fifo_writeByteFunc<T> writeFunc);
 	virtual ~Fifo();
 
-	bool write(const char* buf, uint32_t length);
+	bool write(const T* buf, uint32_t length);
 	void tick();
 protected:
-	Fifo_writeByteFunc writeFunc;
+	Fifo_writeByteFunc<T> writeFunc;
 private:
-	char*const queue;
+	T*const queue;
 	const uint32_t FIFO_LENGTH;
 	volatile uint32_t writePos;
 	volatile uint32_t readPos;
@@ -55,5 +59,63 @@ protected:
 private:
 	volatile bool _overflow;
 };
+
+template <typename T>
+Fifo<T>::Fifo(T*const buf, const uint32_t length, Fifo_writeByteFunc<T> writeFuncParam) :
+        overflow(_overflow),
+		writeFunc(writeFuncParam),
+		queue(buf), FIFO_LENGTH(length),
+		writePos(0), readPos(0), fifoLen(0) {
+
+}
+
+template <typename T>
+Fifo<T>::~Fifo() {
+}
+
+template <typename T>
+bool Fifo<T>::write(const T* buf, uint32_t length) {
+
+	if ((fifoLen + length) <= FIFO_LENGTH) {
+		for (uint32_t i = 0; i < length; i++) {
+			queue[writePos] = buf[i];
+
+			if (writePos < (FIFO_LENGTH - 1)) {
+				writePos++;
+			} else {
+				writePos = 0;
+			}
+		}
+
+		fifoLen += length;
+		tick();
+
+		_overflow = false;
+
+		return true;
+	}
+
+	_overflow = true;
+
+
+	return false;
+}
+
+template <typename T>
+void Fifo<T>::tick() {
+	if (fifoLen == 0) {
+		return;
+	}
+
+	if (writeFunc(queue[readPos])) {
+		if (readPos < (FIFO_LENGTH - 1)) {
+			readPos++;
+		} else {
+			readPos = 0;
+		}
+
+		fifoLen--;
+	}
+}
 
 #endif /* __FIFO_H_ */

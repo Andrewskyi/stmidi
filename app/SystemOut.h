@@ -34,9 +34,9 @@ SOFTWARE.
 
 #define SystemOut_BUFFER_LENGTH 32
 
-class SystemOut : public Fifo {
+class SystemOut : public Fifo<char> {
 public:
-	SystemOut(Fifo_writeByteFunc sendFunc);
+	SystemOut(Fifo_writeByteFunc<char> sendFunc);
 	virtual ~SystemOut();
 private:
 	char buffer[SystemOut_BUFFER_LENGTH];

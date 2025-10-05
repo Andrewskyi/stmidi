@@ -2,6 +2,8 @@
 #include <SystemOut.h>
 #include "stm32f1xx_hal.h"
 #include <usb/usbd_midi_if.h>
+#include <UsbMidiSender.h>
+#include <MidiReceiver.h>
 
 bool usart1send(char b)
 {
@@ -27,6 +29,18 @@ bool usart1rec(char* b)
 	return false;
 }
 
+bool usart2rec(uint8_t& b)
+{
+	if((USART2->SR & USART_SR_RXNE) != 0)
+	{
+		b = (uint8_t)(USART2->DR & 0xFF);
+
+		return true;
+	}
+
+	return false;
+}
+
 SystemOut sysOut(usart1send);
 
 extern "C"
@@ -36,47 +50,49 @@ void sysOutSend(char *buf, uint32_t length)
 	sysOut.write(buf, length);
 }
 
-uint32_t dataReceived = 0;
-char tmpbuf[32];
+bool sendUsbMidi(USB_MIDI_EventPacket_t package)
+{
+	return ( USBD_OK == MIDI_Transmit_FS(package.bytes, 4) );
+}
 
-extern "C"
-int appMain(void)
+UsbMidiSender usbMidiSender(&sendUsbMidi);
+MidiReceiver midiReceiver(&usart2rec, &usbMidiSender);
+
+
+extern "C" int appMain(void)
 {
 	//printf("Hello world\n\r");
 
 	while(true)
 	{
+		uint8_t b1, b2, b3;
+
+		if(midiReceiver.nextEvent(b1, b2, b3)){
+			//printf("midi\n");
+		}
+
 		char b;
 		if(usart1rec(&b)) {
-			if(b == 'a') {
+			if(b == 's') {
 				printf("note ON\n");
 				uint8_t tmp[4];
-				tmp[0] = 0x09;   // CN=0, CIN=0x9 (Note On)
-				tmp[1] = 0x90;   // Note On, channel 1
-				tmp[2] = 60;     // Note number
-				tmp[3] = 100;    // Velocity
-				MIDI_Transmit_FS(tmp, 4);
+				tmp[0] = 0x90;   // Note On, channel 1
+				tmp[1] = 60;     // Note number
+				tmp[2] = 100;    // Velocity
+				usbMidiSender.sendMidi(tmp, 3);
 			}
-			else if(b == 'z') {
+			else if(b == 'x') {
 				printf("note OFF\n");
 			    uint8_t tmp[4];
-			    tmp[0] = 0x08;   // CN=0, CIN=0x9 (Note Off)
-			    tmp[1] = 0x90;   // Note On, channel 1
-			    tmp[2] = 60;     // Note number
-			    tmp[3] = 0;    // Velocity
-			    MIDI_Transmit_FS(tmp, 4);
+			    tmp[0] = 0x90;   // Note On, channel 1
+			    tmp[1] = 60;     // Note number
+			    tmp[2] = 0;    // Velocity
+			    usbMidiSender.sendMidi(tmp, 3);
 			}
 		}
 
-		if(dataReceived){
-			printf("%s", tmpbuf);
-			fflush(stdout);
-			uint8_t tmp[9]={'o','d','e','b','r','a','n','o','\n'};
-			MIDI_Transmit_FS(tmp, 9);
-			//printf("received\n");
-			dataReceived = 0;
-		}
-
+		midiReceiver.tick();
+		usbMidiSender.tick();
 		sysOut.tick();
 	}
 }

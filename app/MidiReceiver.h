@@ -1,5 +1,5 @@
 /*
- * SystemOut.cpp
+ * MidiReceiver.h
  *
  *  Created on: 04.01.2020
  *      Author: apaluch
@@ -27,14 +27,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#include "SystemOut.h"
+#ifndef MIDIRECEIVER_H_
+#define MIDIRECEIVER_H_
 
-SystemOut::SystemOut(Fifo_writeByteFunc<char> sendFunc) :
-	Fifo(buffer, SystemOut_BUFFER_LENGTH, sendFunc)
-{
+#include <stdint.h>
+#include <MidiSender.h>
 
-}
+typedef bool (*MIDI_recByteFunc)(uint8_t& b);
 
-SystemOut::~SystemOut()
-{
-}
+class MidiReceiver {
+public:
+	MidiReceiver(MIDI_recByteFunc recFunc, MidiSender* midiThru);
+	virtual ~MidiReceiver();
+
+	bool nextEvent(uint8_t& b1, uint8_t& b2, uint8_t& b3);
+	void tick();
+private:
+	MIDI_recByteFunc recFunc;
+	MidiSender* midiThru;
+	volatile uint8_t runningStatusByte;
+	volatile uint32_t expectedBytesCount;
+	uint8_t buf[3];
+	volatile uint32_t bytesCount;
+	volatile uint8_t systemRealTimeEvent;
+
+	uint32_t expectedChannelVoiceMsgBytesCount();
+	void trySendSystemRealtime();
+};
+
+#endif /* MIDIRECEIVER_H_ */

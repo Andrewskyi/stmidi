@@ -242,8 +242,8 @@ static int8_t MIDI_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /* USER CODE END 5 */
 }
 
-extern uint32_t dataReceived;
-extern char tmpbuf[32];
+//extern uint32_t dataReceived;
+//extern char tmpbuf[32];
 
 /**
   * @brief  Data received over USB OUT endpoint are sent over MIDI interface
@@ -263,20 +263,20 @@ extern char tmpbuf[32];
 static int8_t MIDI_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
-  if(!dataReceived) {
-	  unsigned len = *Len;
-	  for(unsigned i=0; i<len; i++){
-		  tmpbuf[i]=Buf[i];
-	  }
-
-	  if(len < 32){
-		  tmpbuf[len] = 0;
-	  } else {
-		  tmpbuf[31] = 0;
-	  }
-
-      dataReceived = 1;
-  }
+//  if(!dataReceived) {
+//	  unsigned len = *Len;
+//	  for(unsigned i=0; i<len; i++){
+//		  tmpbuf[i]=Buf[i];
+//	  }
+//
+//	  if(len < 32){
+//		  tmpbuf[len] = 0;
+//	  } else {
+//		  tmpbuf[31] = 0;
+//	  }
+//
+//      dataReceived = 1;
+//  }
 
   USBD_MIDI_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_MIDI_ReceivePacket(&hUsbDeviceFS);

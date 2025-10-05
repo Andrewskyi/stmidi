@@ -1,5 +1,5 @@
 /*
- * TxFifo.cpp
+ * MidiSender.h
  *
  *  Created on: 04.01.2020
  *      Author: apaluch
@@ -27,58 +27,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#include <Fifo.h>
+#ifndef MIDISENDER_H_
+#define MIDISENDER_H_
+#include <stdint.h>
 
-Fifo::Fifo(char*const buf, const uint32_t length, Fifo_writeByteFunc writeFuncParam) :
-        overflow(_overflow),
-		writeFunc(writeFuncParam),
-		queue(buf), FIFO_LENGTH(length),
-		writePos(0), readPos(0), fifoLen(0) {
+class MidiSender
+{
+public:
+	virtual ~MidiSender(){}
 
-}
+	virtual bool sendMidi(const uint8_t* buf, uint32_t length);
+	virtual bool sendMidi(uint8_t b1, uint8_t b2, uint8_t b3);
+	virtual bool sendRealTimeMidi(uint8_t b);
+};
 
-Fifo::~Fifo() {
-}
-
-bool Fifo::write(const char* buf, uint32_t length) {
-
-	if ((fifoLen + length) <= FIFO_LENGTH) {
-		for (uint32_t i = 0; i < length; i++) {
-			queue[writePos] = buf[i];
-
-			if (writePos < (FIFO_LENGTH - 1)) {
-				writePos++;
-			} else {
-				writePos = 0;
-			}
-		}
-
-		fifoLen += length;
-		tick();
-
-		_overflow = false;
-
-		return true;
-	}
-
-	_overflow = true;
-
-
-	return false;
-}
-
-void Fifo::tick() {
-	if (fifoLen == 0) {
-		return;
-	}
-
-	if (writeFunc(queue[readPos])) {
-		if (readPos < (FIFO_LENGTH - 1)) {
-			readPos++;
-		} else {
-			readPos = 0;
-		}
-
-		fifoLen--;
-	}
-}
+#endif /* MIDISENDER_H_ */
