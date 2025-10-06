@@ -20,14 +20,14 @@ MidiUsbSender::~MidiUsbSender()
 
 bool MidiUsbSender::sendMidi(const uint8_t* buf, uint32_t length)
 {
-	UsbMidiEventPacket package = MidiUsbSender::midiToUSB(0, buf, length);
+	UsbMidiEventPacket package = midiToUSB(0, buf, length);
 
 	return fifo.write(&package, 1);
 }
 
 bool MidiUsbSender::sendRealTimeMidi(uint8_t b)
 {
-	UsbMidiEventPacket package = MidiUsbSender::midiToUSB(0, &b, 1);
+	UsbMidiEventPacket package = midiToUSB(0, &b, 1);
 
 	return fifo.write(&package, 1);
 }

@@ -17,6 +17,8 @@ bool usart1rec(char* b);
 
 bool usart2rec(uint8_t& b);
 
+bool usart2send(uint8_t b);
+
 bool sendUsbMidi(UsbMidiEventPacket package);
 
 

@@ -3,10 +3,18 @@
 #include <LowLevelFunctions.h>
 #include <MidiSerialReceiver.h>
 #include <MidiUsbSender.h>
+#include <MidiSerialSender.h>
+#include <MidiUsbReceiver.h>
 
 SystemOut sysOut(usart1send);
+
+// serial to USB
 MidiUsbSender usbMidiSender(&sendUsbMidi);
-MidiSerialReceiver serialMidiReceiver(&usart2rec, &usbMidiSender);
+MidiSerialReceiver midiSerialReceiver(&usart2rec, &usbMidiSender);
+
+// USB to serial
+MidiSerialSender midiSerialSender(&usart2send);
+MidiUsbReceiver midiUsbReceiver(midiSerialSender);
 
 extern "C" int appMain(void)
 {
@@ -16,13 +24,18 @@ extern "C" int appMain(void)
 	{
 		uint8_t b1, b2, b3;
 
-		if(serialMidiReceiver.nextEvent(b1, b2, b3)){
+		if(midiSerialReceiver.nextEvent(b1, b2, b3)){
 			//printf("midi\n");
 			// place to trigger LED
 		}
 
-		serialMidiReceiver.tick();
+		// serial to USB
 		usbMidiSender.tick();
+		midiSerialReceiver.tick();
+        // USB to serial
+		midiSerialSender.tick();
+		midiUsbReceiver.tick();
+
 		sysOut.tick();
 	}
 }

@@ -39,27 +39,6 @@ SOFTWARE.
 
  bool isValidUsbMidiheader = ( (data[i] & 0x0F) <= 0x0F && (data[i+1] & 0x80) );
 
-uint8_t usb_midi_valid_length(uint8_t cin)
-{
-    switch (cin) {
-        case 0x2: return 2;
-        case 0x3: return 3;
-        case 0x4: return 3;
-        case 0x5: return 1;
-        case 0x6: return 3;
-        case 0x7: return 1;
-        case 0x8: return 3;
-        case 0x9: return 3;
-        case 0xA: return 3;
-        case 0xB: return 3;
-        case 0xC: return 2;
-        case 0xD: return 2;
-        case 0xE: return 3;
-        case 0xF: return 1;
-        default:  return 0; // reserved or undefined
-    }
-}
-
  */
 
 #define MidiUsbReceiver_BUF_LEN 24
