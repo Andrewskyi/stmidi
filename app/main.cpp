@@ -35,10 +35,6 @@ extern "C" int appMain(void)
         // USB to serial
 		midiSerialSender.tick();
 		midiUsbReceiver.tick();
-uint8_t b;
-		if(usart2rec(b)) {
-				midiSerialReceiver.newUartByte(b);
-			}
 
 		sysOut.tick();
 	}
