@@ -32,22 +32,25 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <MidiSender.h>
+#include <SafeFifo.h>
 
-typedef bool (*MIDI_recByteFunc)(uint8_t& b);
+#define  MidiSerialReceiver_BUF_LEN 32
 
 class MidiSerialReceiver {
 public:
-	MidiSerialReceiver(MIDI_recByteFunc recFunc, MidiSender* midiThru);
+	MidiSerialReceiver(MidiSender* midiThru);
 	virtual ~MidiSerialReceiver();
 
+	void newUartByte(uint8_t b);
 	bool nextEvent(uint8_t& b1, uint8_t& b2, uint8_t& b3);
 	void tick();
 private:
-	MIDI_recByteFunc recFunc;
+	uint8_t buf[MidiSerialReceiver_BUF_LEN];
+	SafeFifo<uint8_t> fifo;
 	MidiSender* midiThru;
 	volatile uint8_t runningStatusByte;
 	volatile uint32_t expectedBytesCount;
-	uint8_t buf[3];
+	uint8_t midiCommandBuf[3];
 	volatile uint32_t bytesCount;
 	volatile uint8_t systemRealTimeEvent;
 

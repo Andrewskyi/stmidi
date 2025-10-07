@@ -30,18 +30,22 @@ SOFTWARE.
 #include <MidiSerialReceiver.h>
 #include <stdio.h>
 
-MidiSerialReceiver::MidiSerialReceiver(MIDI_recByteFunc recFunc, MidiSender* midiThru) :
-		recFunc(recFunc), midiThru(midiThru), runningStatusByte(0), bytesCount(
+MidiSerialReceiver::MidiSerialReceiver(MidiSender* midiThru) :
+		fifo(buf, MidiSerialReceiver_BUF_LEN), midiThru(midiThru), runningStatusByte(0), bytesCount(
 				0), systemRealTimeEvent(0) {
 }
 
 MidiSerialReceiver::~MidiSerialReceiver() {
 }
 
+void MidiSerialReceiver::newUartByte(uint8_t b) {
+	fifo.write(b);
+}
+
 bool MidiSerialReceiver::nextEvent(uint8_t& b1, uint8_t& b2, uint8_t& b3) {
 	uint8_t b;
 
-	if (recFunc(b)) {
+	if (fifo.read(b)) {
 		// Channel Voice Message
 		if (b >= 0x80 && b <= 0xEF) {
 			runningStatusByte = b;
@@ -54,7 +58,7 @@ bool MidiSerialReceiver::nextEvent(uint8_t& b1, uint8_t& b2, uint8_t& b3) {
 		// System Common Messages
 		else if (b >= 0xF0 && b <= 0xF7) {
 			runningStatusByte = 0;
-			buf[0] = b;
+			midiCommandBuf[0] = b;
 
 			switch (b) {
 			case 0xF0:
@@ -90,7 +94,7 @@ bool MidiSerialReceiver::nextEvent(uint8_t& b1, uint8_t& b2, uint8_t& b3) {
 		// System Real-Time Messages
 
 		else if (b <= 127 && bytesCount < expectedBytesCount) {
-			buf[bytesCount] = b;
+			midiCommandBuf[bytesCount] = b;
 			bytesCount++;
 		}
 
@@ -98,14 +102,14 @@ bool MidiSerialReceiver::nextEvent(uint8_t& b1, uint8_t& b2, uint8_t& b3) {
 
 		if (bytesCount > 0 && bytesCount == expectedBytesCount) {
 			if (runningStatusByte > 0) {
-				buf[0] = runningStatusByte;
+				midiCommandBuf[0] = runningStatusByte;
 			}
 
 			//printf("%X %X %X\r\n", buf[0], buf[1], buf[2]);
 			//printf("%X\r\n", buf[0]);
 
 			if (midiThru) {
-				midiThru->sendMidi(buf, bytesCount);
+				midiThru->sendMidi(midiCommandBuf, bytesCount);
 			}
 
 			if (bytesCount == 3 &&
@@ -116,9 +120,9 @@ bool MidiSerialReceiver::nextEvent(uint8_t& b1, uint8_t& b2, uint8_t& b3) {
 				)
 			)
 			{
-				b1 = buf[0];
-				b2 = buf[1];
-				b3 = buf[2];
+				b1 = midiCommandBuf[0];
+				b2 = midiCommandBuf[1];
+				b3 = midiCommandBuf[2];
 
 				eventForLooper = true;
 			}

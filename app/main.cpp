@@ -10,7 +10,7 @@ SystemOut sysOut(usart1send);
 
 // serial to USB
 MidiUsbSender usbMidiSender(&sendUsbMidi);
-MidiSerialReceiver midiSerialReceiver(&usart2rec, &usbMidiSender);
+MidiSerialReceiver midiSerialReceiver(&usbMidiSender);
 
 // USB to serial
 MidiSerialSender midiSerialSender(&usart2send);
@@ -35,6 +35,10 @@ extern "C" int appMain(void)
         // USB to serial
 		midiSerialSender.tick();
 		midiUsbReceiver.tick();
+uint8_t b;
+		if(usart2rec(b)) {
+				midiSerialReceiver.newUartByte(b);
+			}
 
 		sysOut.tick();
 	}

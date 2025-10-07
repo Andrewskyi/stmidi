@@ -3,10 +3,12 @@
 #include <SystemOut.h>
 #include <usb/usbd_midi_if.h>
 #include <MidiUsbReceiver.h>
+#include <MidiSerialReceiver.h>
 
 
 extern SystemOut sysOut;
 extern MidiUsbReceiver midiUsbReceiver;
+extern MidiSerialReceiver midiSerialReceiver;
 
 bool usart1send(char b)
 {
@@ -54,6 +56,16 @@ bool usart2send(uint8_t b)
 	USART2->DR = (uint8_t)b;
 
 	return true;
+}
+
+extern "C"
+void usart2Interrupt()
+{
+	uint8_t b;
+
+	if(usart2rec(b)) {
+		midiSerialReceiver.newUartByte(b);
+	}
 }
 
 extern "C"

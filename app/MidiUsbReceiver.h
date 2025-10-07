@@ -35,11 +35,6 @@ SOFTWARE.
 #include <MidiSender.h>
 #include <SafeFifo.h>
 
-/*
-
- bool isValidUsbMidiheader = ( (data[i] & 0x0F) <= 0x0F && (data[i+1] & 0x80) );
-
- */
 
 #define MidiUsbReceiver_BUF_LEN 24
 
