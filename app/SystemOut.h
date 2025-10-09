@@ -32,7 +32,7 @@ SOFTWARE.
 
 #include <Fifo.h>
 
-#define SystemOut_BUFFER_LENGTH 32
+#define SystemOut_BUFFER_LENGTH 128
 
 class SystemOut : public Fifo<char> {
 public:

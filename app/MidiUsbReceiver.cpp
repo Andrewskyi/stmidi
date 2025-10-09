@@ -25,10 +25,10 @@ bool MidiUsbReceiver::newUsbEvent(const UsbMidiEventPacket& packet)
 
 void MidiUsbReceiver::tick()
 {
-	UsbMidiEventPacket packet;
-
 	if(inputFifo.peek(packet)) {
-		if( midiThru.sendMidi(&(packet.bytes[1]), serialMidiLength(0x0F & packet.bytes[0] /*cin*/)) ) {
+		midiEvent.event.len = serialMidiLength(0x0F & packet.bytes[0] /*cin*/);
+
+		if( midiThru.sendMidi(midiEvent.event) ) {
 			inputFifo.skeep();
 		}
 	}

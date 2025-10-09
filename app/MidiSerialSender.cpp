@@ -12,21 +12,14 @@ MidiSerialSender::MidiSerialSender(Fifo_writeElementFunc<uint8_t> writeFunc) :
 
 }
 
-bool MidiSerialSender::sendMidi(const uint8_t* buf, uint32_t length)
+bool MidiSerialSender::sendMidi(const MidiEvent& midiEvent)
 {
-	return fifo.write(buf, length);
-}
-
-bool MidiSerialSender::sendMidi(uint8_t b1, uint8_t b2, uint8_t b3)
-{
-	uint8_t buf[3] = {b1, b2, b3};
-
-	return sendMidi(buf, 3);
+	return fifo.write(midiEvent.buf, midiEvent.len);
 }
 
 bool MidiSerialSender::sendRealTimeMidi(uint8_t b)
 {
-	return sendMidi(&b, 1);
+	return fifo.write(&b, 1);
 }
 
 void MidiSerialSender::tick()

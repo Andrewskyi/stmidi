@@ -22,20 +22,15 @@ extern "C" int appMain(void)
 
 	while(true)
 	{
-		uint8_t b1, b2, b3;
-
-		if(midiSerialReceiver.nextEvent(b1, b2, b3)){
-			//printf("midi\n");
-			// place to trigger LED
-		}
-
 		// serial to USB
 		usbMidiSender.tick();
 		midiSerialReceiver.tick();
-        // USB to serial
+
+		// USB to serial
 		midiSerialSender.tick();
 		midiUsbReceiver.tick();
 
+		// stdout
 		sysOut.tick();
 	}
 }

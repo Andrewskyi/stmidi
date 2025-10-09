@@ -32,11 +32,12 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <UsbMidiEventPacket.h>
+#include <MidiEvent.h>
 #include <MidiSender.h>
 #include <SafeFifo.h>
 
 
-#define MidiUsbReceiver_BUF_LEN 24
+#define MidiUsbReceiver_BUF_LEN 1200
 
 class MidiUsbReceiver {
 public:
@@ -52,7 +53,14 @@ private:
 	SafeFifo<UsbMidiEventPacket> inputFifo;
 	MidiSender& midiThru;
 	UsbMidiEventPacket buf[MidiUsbReceiver_BUF_LEN];
-
+	struct MidiEventWithUsbHeader {
+		uint8_t usbHeader;
+		MidiEvent event;
+	};
+	union {
+	  UsbMidiEventPacket packet;
+	  MidiEventWithUsbHeader midiEvent;
+	};
 	uint8_t serialMidiLength(uint8_t cin);
 };
 

@@ -30,14 +30,14 @@ SOFTWARE.
 #ifndef MIDISENDER_H_
 #define MIDISENDER_H_
 #include <stdint.h>
+#include <MidiEvent.h>
 
 class MidiSender
 {
 public:
 	virtual ~MidiSender(){}
 
-	virtual bool sendMidi(const uint8_t* buf, uint32_t length);
-	virtual bool sendMidi(uint8_t b1, uint8_t b2, uint8_t b3);
+	virtual bool sendMidi(const MidiEvent& midiEvent);
 	virtual bool sendRealTimeMidi(uint8_t b);
 };
 

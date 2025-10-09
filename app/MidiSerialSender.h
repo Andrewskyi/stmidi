@@ -11,15 +11,14 @@
 #ifndef MIDISERIALSENDER_H_
 #define MIDISERIALSENDER_H_
 
-#define MidiSerialSender_BUF_LEN 32
+#define MidiSerialSender_BUF_LEN 2048
 
 class MidiSerialSender : public MidiSender {
 public:
 	MidiSerialSender(Fifo_writeElementFunc<uint8_t> writeFunc);
 	virtual ~MidiSerialSender(){}
 
-	virtual bool sendMidi(const uint8_t* buf, uint32_t length);
-	virtual bool sendMidi(uint8_t b1, uint8_t b2, uint8_t b3);
+	virtual bool sendMidi(const MidiEvent& midiEvent);
 	virtual bool sendRealTimeMidi(uint8_t b);
 
 	void tick();

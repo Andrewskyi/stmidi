@@ -13,15 +13,14 @@
 #ifndef USBMIDISENDER_H_
 #define USBMIDISENDER_H_
 
-#define MidiUsbSender_BUF_LEN 32
+#define MidiUsbSender_BUF_LEN 1024
 
 class MidiUsbSender : public MidiSender {
 public:
 	MidiUsbSender(Fifo_writeElementFunc<UsbMidiEventPacket> writeFunc);
 	virtual ~MidiUsbSender();
 
-	virtual bool sendMidi(const uint8_t* buf, uint32_t length);
-	virtual bool sendMidi(uint8_t b1, uint8_t b2, uint8_t b3);
+	virtual bool sendMidi(const MidiEvent& midiEvent);
 	virtual bool sendRealTimeMidi(uint8_t b);
 
 	void tick();

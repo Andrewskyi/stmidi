@@ -31,8 +31,9 @@ SOFTWARE.
 #include <stdio.h>
 
 MidiSerialReceiver::MidiSerialReceiver(MidiSender* midiThru) :
-		fifo(buf, MidiSerialReceiver_BUF_LEN), midiThru(midiThru), runningStatusByte(0), bytesCount(
-				0), systemRealTimeEvent(0) {
+    fifo(buf, MidiSerialReceiver_BUF_LEN), midiThru(midiThru), runningStatusByte(0)
+{
+	midiEvent.len = 0;
 }
 
 MidiSerialReceiver::~MidiSerialReceiver() {
@@ -42,108 +43,85 @@ void MidiSerialReceiver::newUartByte(uint8_t b) {
 	fifo.write(b);
 }
 
-bool MidiSerialReceiver::nextEvent(uint8_t& b1, uint8_t& b2, uint8_t& b3) {
+void MidiSerialReceiver::nextEvent() {
 	uint8_t b;
 
 	if (fifo.read(b)) {
-		// Channel Voice Message
+		// Channel Voice Message Header
 		if (b >= 0x80 && b <= 0xEF) {
 			runningStatusByte = b;
-			bytesCount = 1;
+			midiEvent.len = 1;
 
 			expectedBytesCount = expectedChannelVoiceMsgBytesCount();
 		}
-		// Channel Voice Message
-
-		// System Common Messages
+		// System Common Message Header
 		else if (b >= 0xF0 && b <= 0xF7) {
 			runningStatusByte = 0;
-			midiCommandBuf[0] = b;
+			midiEvent.buf[0] = b;
 
 			switch (b) {
-			case 0xF0:
-			case 0xF7:
+			case 0xF0: // sys exclusive
+			case 0xF7: // end of system exclusive
 				// ignore message
 				expectedBytesCount = 0;
-				bytesCount = 0;
+				midiEvent.len = 0;
 				break;
-			case 0xF1:
-			case 0xF3:
+			case 0xF1: // MIDI Time Code Quarter Frame
+			case 0xF3: // Song Select
 				expectedBytesCount = 2;
-				bytesCount = 1;
+				midiEvent.len = 1;
 				break;
-			case 0xF2:
+			case 0xF2: // Song Position Pointer
 				expectedBytesCount = 3;
-				bytesCount = 1;
+				midiEvent.len = 1;
 				break;
-			case 0xF4:
-			case 0xF5:
-			case 0xF6:
+			case 0xF4: // undefined
+			case 0xF5: // undefined
+			case 0xF6: // tune request
 				expectedBytesCount = 1;
-				bytesCount = 1;
+				midiEvent.len = 1;
 				break;
 			}
 		}
-		// System Common Messages
-
-		// System Real-Time Messages
+		// System Real-Time Message Header
 		else if (b >= 0xF8) {
-			systemRealTimeEvent = b;
-			trySendSystemRealtime();
+			midiThru->sendRealTimeMidi(b);
 		}
-		// System Real-Time Messages
-
-		else if (b <= 127 && bytesCount < expectedBytesCount) {
-			midiCommandBuf[bytesCount] = b;
-			bytesCount++;
+        // additional bytes
+		else if (b <= 127 && midiEvent.len < expectedBytesCount) {
+			midiEvent.buf[midiEvent.len] = b;
+			midiEvent.len++;
 		}
 
-		bool eventForLooper = false;
-
-		if (bytesCount > 0 && bytesCount == expectedBytesCount) {
+		if (midiEvent.len > 0 && midiEvent.len == expectedBytesCount) {
 			if (runningStatusByte > 0) {
-				midiCommandBuf[0] = runningStatusByte;
+				midiEvent.buf[0] = runningStatusByte;
 			}
 
 			//printf("%X %X %X\r\n", buf[0], buf[1], buf[2]);
 			//printf("%X\r\n", buf[0]);
 
 			if (midiThru) {
-				midiThru->sendMidi(midiCommandBuf, bytesCount);
-			}
-
-			if (bytesCount == 3 &&
-				(
-				    (runningStatusByte & 0xF0) == 0x80 ||
-					(runningStatusByte & 0xF0) == 0x90 ||
-					(runningStatusByte & 0xF0) == 0xB0
-				)
-			)
-			{
-				b1 = midiCommandBuf[0];
-				b2 = midiCommandBuf[1];
-				b3 = midiCommandBuf[2];
-
-				eventForLooper = true;
+				midiThru->sendMidi(midiEvent);
 			}
 
 			if (runningStatusByte > 0) {
-				bytesCount = 1;
+				midiEvent.len = 1;
 				expectedBytesCount = expectedChannelVoiceMsgBytesCount();
 			} else {
-				bytesCount = 0;
+				midiEvent.len = 0;
 				expectedBytesCount = 0;
 			}
-		}
 
-		return eventForLooper;
+			//return true;
+		}
 	}
 
-	return false;
+	//return false;
 }
 
 void MidiSerialReceiver::tick() {
-	trySendSystemRealtime();
+	nextEvent();
 }
 
 uint32_t MidiSerialReceiver::expectedChannelVoiceMsgBytesCount() {
@@ -153,17 +131,5 @@ uint32_t MidiSerialReceiver::expectedChannelVoiceMsgBytesCount() {
 		return 2;
 	default:
 		return 3;
-	}
-}
-
-void MidiSerialReceiver::trySendSystemRealtime() {
-	if (systemRealTimeEvent) {
-		if (midiThru) {
-			if (midiThru->sendRealTimeMidi(systemRealTimeEvent)) {
-				systemRealTimeEvent = 0;
-			}
-		} else {
-			systemRealTimeEvent = 0;
-		}
 	}
 }

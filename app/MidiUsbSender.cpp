@@ -18,9 +18,9 @@ MidiUsbSender::~MidiUsbSender()
 
 }
 
-bool MidiUsbSender::sendMidi(const uint8_t* buf, uint32_t length)
+bool MidiUsbSender::sendMidi(const MidiEvent& midiEvent)
 {
-	UsbMidiEventPacket package = midiToUSB(0, buf, length);
+	UsbMidiEventPacket package = midiToUSB(0, midiEvent.buf, midiEvent.len);
 
 	return fifo.write(&package, 1);
 }
@@ -30,13 +30,6 @@ bool MidiUsbSender::sendRealTimeMidi(uint8_t b)
 	UsbMidiEventPacket package = midiToUSB(0, &b, 1);
 
 	return fifo.write(&package, 1);
-}
-
-bool MidiUsbSender::sendMidi(uint8_t b1, uint8_t b2, uint8_t b3)
-{
-	uint8_t buf2[3] = { b1, b2, b3 };
-
-	return sendMidi(buf2, 3);
 }
 
 void MidiUsbSender::tick()
