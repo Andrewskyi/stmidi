@@ -33,9 +33,9 @@
 
 #include "usb_device.h"
 #include "usbd_core.h"
-#include "usb/usbd_midi_desc.h"
-#include "usb/usbd_midi.h"
-#include "usb/usbd_midi_if.h"
+#include <usb/UsbMidiDeviceDesc.h>
+#include <usb/UsbMidiClass.h>
+#include <usb/UsbMidiClassIf.h>
 
 /* USER CODE END Includes */
 
@@ -102,11 +102,11 @@ void MX_USB_DEVICE_Init(void)
 	{
 	  Error_Handler();
 	}
-	if (USBD_RegisterClass(&hUsbDeviceFS, &USBD_MIDI) != USBD_OK)
+	if (USBD_RegisterClass(&hUsbDeviceFS, UsbMidiClass_CLASS) != USBD_OK)
 	{
 	  Error_Handler();
 	}
-	if (USBD_MIDI_RegisterInterface(&hUsbDeviceFS, &USBD_MIDI_Interface_fops_FS) != USBD_OK)
+	if (UsbMidiClass_registerInterface(&hUsbDeviceFS, &UsbMidiClass_Interface_fops_FS) != USBD_OK)
 	{
 	  Error_Handler();
 	}

@@ -19,7 +19,7 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include <usb/usbd_midi_desc.h>
+#include <usb/UsbMidiDeviceDesc.h>
 #include "usbd_core.h"
 #include "usbd_conf.h"
 
@@ -64,7 +64,7 @@
 
 #define USBD_VID     1155
 #define USBD_LANGID_STRING     1033
-#define USBD_MANUFACTURER_STRING     "STMicroelectronics"
+#define USBD_MANUFACTURER_STRING     "apaluch"
 #define USBD_PID_FS     22336
 #define USBD_PRODUCT_STRING_FS     "apaluch_midi"
 #define USBD_CONFIGURATION_STRING_FS     "apaluch_midi Config"

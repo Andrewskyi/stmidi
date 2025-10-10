@@ -20,7 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <stdio.h>
-#include "usbd_midi_if.h"
+#include <usb/UsbMidiClassIf.h>
 
 /* USER CODE BEGIN INCLUDE */
 
@@ -138,7 +138,7 @@ static int8_t MIDI_Receive_FS(uint8_t* pbuf, uint32_t *Len);
   * @}
   */
 
-USBD_MIDI_ItfTypeDef USBD_MIDI_Interface_fops_FS =
+UsbMidiClass_ItfTypeDef UsbMidiClass_Interface_fops_FS =
 {
   MIDI_Init_FS,
   MIDI_DeInit_FS,
@@ -155,8 +155,8 @@ static int8_t MIDI_Init_FS(void)
 {
   /* USER CODE BEGIN 3 */
   /* Set Application Buffers */
-  USBD_MIDI_SetTxBuffer(&hUsbDeviceFS, MidiTxBufferFS, 0);
-  USBD_MIDI_SetRxBuffer(&hUsbDeviceFS, MidiRxBufferFS);
+  UsbMidiClass_SetTxBuffer(&hUsbDeviceFS, MidiTxBufferFS, 0);
+  UsbMidiClass_SetRxBuffer(&hUsbDeviceFS, MidiRxBufferFS);
   return (USBD_OK);
   /* USER CODE END 3 */
 }
@@ -267,8 +267,8 @@ static int8_t MIDI_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
   newUsbMidiData(Buf, *Len);
-  USBD_MIDI_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
-  USBD_MIDI_ReceivePacket(&hUsbDeviceFS);
+  UsbMidiClass_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+  UsbMidiClass_ReceivePacket(&hUsbDeviceFS);
   return (USBD_OK);
   /* USER CODE END 6 */
 }
@@ -288,12 +288,12 @@ uint8_t MIDI_Transmit_FS(uint8_t* Buf, uint16_t Len)
 {
   uint8_t result = USBD_OK;
   /* USER CODE BEGIN 7 */
-  USBD_MIDI_HandleTypeDef *hmidi = (USBD_MIDI_HandleTypeDef*)hUsbDeviceFS.pClassData;
+  UsbMidiClass_HandleTypeDef *hmidi = (UsbMidiClass_HandleTypeDef*)hUsbDeviceFS.pClassData;
   if (hmidi->TxState != 0){
     return USBD_BUSY;
   }
-  USBD_MIDI_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
-  result = USBD_MIDI_TransmitPacket(&hUsbDeviceFS);
+  UsbMidiClass_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
+  result = UsbMidiClass_TransmitPacket(&hUsbDeviceFS);
   /* USER CODE END 7 */
   return result;
 }

@@ -28,7 +28,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "usbd_midi.h"
+#include <usb/UsbMidiClass.h>
 
 /* USER CODE BEGIN INCLUDE */
 
@@ -91,7 +91,7 @@
   */
 
 /** MIDI Interface callback. */
-extern USBD_MIDI_ItfTypeDef USBD_MIDI_Interface_fops_FS;
+extern UsbMidiClass_ItfTypeDef UsbMidiClass_Interface_fops_FS;
 
 /* USER CODE BEGIN EXPORTED_VARIABLES */
 

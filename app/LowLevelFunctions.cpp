@@ -1,9 +1,9 @@
 #include <LowLevelFunctions.h>
 #include <stm32f1xx_hal.h>
 #include <SystemOut.h>
-#include <usb/usbd_midi_if.h>
 #include <MidiUsbReceiver.h>
 #include <MidiSerialReceiver.h>
+#include <usb/UsbMidiClassIf.h>
 
 
 extern SystemOut sysOut;

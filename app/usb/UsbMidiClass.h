@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * @file    usbd_midi.h
+  * @file    UsbMidiClass.h
   * @author  MCD Application Team
-  * @brief   header file for the usbd_midi.c file.
+  * @brief   header file for the UsbMidiClass.c file.
   ******************************************************************************
   * @attention
   *
@@ -32,13 +32,13 @@ extern "C" {
   * @{
   */
 
-/** @defgroup usbd_midi
-  * @brief This file is the Header file for usbd_midi.c
+/** @defgroup UsbMidiClass
+  * @brief This file is the Header file for UsbMidiClass.c
   * @{
   */
 
 
-/** @defgroup usbd_midi_Exported_Defines
+/** @defgroup UsbMidiClass_Exported_Defines
   * @{
   */
 #define MIDI_IN_EP                                   0x81U  /* EP1 for data IN */
@@ -96,16 +96,16 @@ typedef struct
   uint8_t  format;
   uint8_t  paritytype;
   uint8_t  datatype;
-} USBD_MIDI_LineCodingTypeDef;
+} UsbMidiClass_LineCodingTypeDef;
 
-typedef struct _USBD_MIDI_Itf
+typedef struct _UsbMidiClass_Itf
 {
   int8_t (* Init)(void);
   int8_t (* DeInit)(void);
   int8_t (* Control)(uint8_t cmd, uint8_t *pbuf, uint16_t length);
   int8_t (* Receive)(uint8_t *Buf, uint32_t *Len);
 
-} USBD_MIDI_ItfTypeDef;
+} UsbMidiClass_ItfTypeDef;
 
 
 typedef struct
@@ -121,7 +121,7 @@ typedef struct
   __IO uint32_t TxState;
   __IO uint32_t RxState;
 }
-USBD_MIDI_HandleTypeDef;
+UsbMidiClass_HandleTypeDef;
 
 
 
@@ -137,8 +137,8 @@ USBD_MIDI_HandleTypeDef;
   * @{
   */
 
-extern USBD_ClassTypeDef  USBD_MIDI;
-#define USBD_MIDI_CLASS    &USBD_MIDI
+extern USBD_ClassTypeDef  UsbMidiClass;
+#define UsbMidiClass_CLASS    &UsbMidiClass
 /**
   * @}
   */
@@ -146,19 +146,19 @@ extern USBD_ClassTypeDef  USBD_MIDI;
 /** @defgroup USB_CORE_Exported_Functions
   * @{
   */
-uint8_t  USBD_MIDI_RegisterInterface(USBD_HandleTypeDef   *pdev,
-                                    USBD_MIDI_ItfTypeDef *fops);
+uint8_t  UsbMidiClass_registerInterface(USBD_HandleTypeDef   *pdev,
+                                    UsbMidiClass_ItfTypeDef *fops);
 
-uint8_t  USBD_MIDI_SetTxBuffer(USBD_HandleTypeDef   *pdev,
+uint8_t  UsbMidiClass_SetTxBuffer(USBD_HandleTypeDef   *pdev,
                               uint8_t  *pbuff,
                               uint16_t length);
 
-uint8_t  USBD_MIDI_SetRxBuffer(USBD_HandleTypeDef   *pdev,
+uint8_t  UsbMidiClass_SetRxBuffer(USBD_HandleTypeDef   *pdev,
                               uint8_t  *pbuff);
 
-uint8_t  USBD_MIDI_ReceivePacket(USBD_HandleTypeDef *pdev);
+uint8_t  UsbMidiClass_ReceivePacket(USBD_HandleTypeDef *pdev);
 
-uint8_t  USBD_MIDI_TransmitPacket(USBD_HandleTypeDef *pdev);
+uint8_t  UsbMidiClass_TransmitPacket(USBD_HandleTypeDef *pdev);
 /**
   * @}
   */
