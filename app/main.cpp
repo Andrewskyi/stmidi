@@ -18,8 +18,6 @@ MidiUsbReceiver midiUsbReceiver(midiSerialSender);
 
 extern "C" int appMain(void)
 {
-	//printf("Hello world\n\r");
-
 	while(true)
 	{
 		// serial to USB

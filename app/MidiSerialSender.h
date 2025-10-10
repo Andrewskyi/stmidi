@@ -25,6 +25,7 @@ public:
 private:
 	uint8_t buf[MidiSerialSender_BUF_LEN];
     Fifo<uint8_t> fifo;
+    uint8_t runningStatus;
 };
 
 #endif /* MIDISERIALSENDER_H_ */
