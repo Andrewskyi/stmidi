@@ -39,16 +39,18 @@ SOFTWARE.
 
 class MidiSerialReceiver {
 public:
-	MidiSerialReceiver(MidiSender* midiThru);
+	MidiSerialReceiver(MidiSender& midiThru);
 	virtual ~MidiSerialReceiver();
 
 	void newUartByte(uint8_t b);
 	void tick();
 private:
 	MidiEvent midiEvent;
+	bool midiEventPending;
+	uint8_t runtimeEventPending;
 	uint8_t buf[MidiSerialReceiver_BUF_LEN];
 	SafeFifo<uint8_t> fifo;
-	MidiSender* midiThru;
+	MidiSender& midiThru;
 	volatile uint8_t runningStatusByte;
 	volatile uint32_t expectedBytesCount;
 

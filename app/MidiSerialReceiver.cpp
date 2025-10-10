@@ -30,8 +30,9 @@ SOFTWARE.
 #include <MidiSerialReceiver.h>
 #include <stdio.h>
 
-MidiSerialReceiver::MidiSerialReceiver(MidiSender* midiThru) :
-    fifo(buf, MidiSerialReceiver_BUF_LEN), midiThru(midiThru), runningStatusByte(0)
+MidiSerialReceiver::MidiSerialReceiver(MidiSender& midiThru) :
+  midiEventPending(false), runtimeEventPending(0),
+  fifo(buf, MidiSerialReceiver_BUF_LEN), midiThru(midiThru), runningStatusByte(0)
 {
 	midiEvent.len = 0;
 }
@@ -44,9 +45,23 @@ void MidiSerialReceiver::newUartByte(uint8_t b) {
 }
 
 void MidiSerialReceiver::nextEvent() {
+	// try to send runtime event if pending
+	if(runtimeEventPending) {
+		if(midiThru.sendRealTimeMidi(runtimeEventPending)) {
+		  runtimeEventPending = 0;
+		} else {
+		  return;
+		}
+	}
+
+	// try to send regular event if pending
+	if(midiEventPending && midiThru.sendMidi(midiEvent)) {
+		midiEventPending = false;
+	}
+
 	uint8_t b;
 
-	if (fifo.read(b)) {
+	if (!midiEventPending && fifo.read(b)) {
 		// Channel Voice Message Header
 		if (b >= 0x80 && b <= 0xEF) {
 			runningStatusByte = b;
@@ -85,7 +100,9 @@ void MidiSerialReceiver::nextEvent() {
 		}
 		// System Real-Time Message Header
 		else if (b >= 0xF8) {
-			midiThru->sendRealTimeMidi(b);
+			if(!midiThru.sendRealTimeMidi(b)) {
+				runtimeEventPending = b;
+			}
 		}
         // additional bytes
 		else if (b <= 127 && midiEvent.len < expectedBytesCount) {
@@ -98,12 +115,7 @@ void MidiSerialReceiver::nextEvent() {
 				midiEvent.buf[0] = runningStatusByte;
 			}
 
-			//printf("%X %X %X\r\n", buf[0], buf[1], buf[2]);
-			//printf("%X\r\n", buf[0]);
-
-			if (midiThru) {
-				midiThru->sendMidi(midiEvent);
-			}
+			midiEventPending = !midiThru.sendMidi(midiEvent);
 
 			if (runningStatusByte > 0) {
 				midiEvent.len = 1;
@@ -112,12 +124,8 @@ void MidiSerialReceiver::nextEvent() {
 				midiEvent.len = 0;
 				expectedBytesCount = 0;
 			}
-
-			//return true;
 		}
 	}
-
-	//return false;
 }
 
 void MidiSerialReceiver::tick() {

@@ -33,18 +33,18 @@ SOFTWARE.
 #include <stdint.h>
 #include <FifoWriteElementFunc.h>
 
-template <typename T>
+template <typename T, typename WriteFuncParamT=T>
 class Fifo {
 public:
 	volatile const bool& overflow;
 
-	Fifo(T*const buf, const uint32_t length, Fifo_writeElementFunc<T> writeFunc);
+	Fifo(T*const buf, const uint32_t length, Fifo_writeElementFunc<WriteFuncParamT> writeFunc);
 	virtual ~Fifo();
 
 	bool write(const T* buf, uint32_t length);
 	void tick();
 protected:
-	Fifo_writeElementFunc<T> writeFunc;
+	Fifo_writeElementFunc<WriteFuncParamT> writeFunc;
 private:
 	T*const queue;
 	const uint32_t FIFO_LENGTH;
@@ -56,8 +56,8 @@ private:
 	volatile bool _overflow = false;
 };
 
-template <typename T>
-Fifo<T>::Fifo(T*const buf, const uint32_t length, Fifo_writeElementFunc<T> writeFuncParam) :
+template <typename T, typename WriteFuncParamT>
+Fifo<T, WriteFuncParamT>::Fifo(T*const buf, const uint32_t length, Fifo_writeElementFunc<WriteFuncParamT> writeFuncParam) :
         overflow(_overflow),
 		writeFunc(writeFuncParam),
 		queue(buf), FIFO_LENGTH(length),
@@ -65,12 +65,12 @@ Fifo<T>::Fifo(T*const buf, const uint32_t length, Fifo_writeElementFunc<T> write
 
 }
 
-template <typename T>
-Fifo<T>::~Fifo() {
+template <typename T, typename WriteFuncParamT>
+Fifo<T, WriteFuncParamT>::~Fifo() {
 }
 
-template <typename T>
-bool Fifo<T>::write(const T* buf, uint32_t length) {
+template <typename T, typename WriteFuncParamT>
+bool Fifo<T, WriteFuncParamT>::write(const T* buf, uint32_t length) {
 
 	if ((fifoLen + length) <= FIFO_LENGTH) {
 		for (uint32_t i = 0; i < length; i++) {
@@ -97,8 +97,8 @@ bool Fifo<T>::write(const T* buf, uint32_t length) {
 	return false;
 }
 
-template <typename T>
-void Fifo<T>::tick() {
+template <typename T, typename WriteFuncParamT>
+void Fifo<T, WriteFuncParamT>::tick() {
 	if (fifoLen == 0) {
 		return;
 	}

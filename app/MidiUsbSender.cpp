@@ -7,7 +7,7 @@
 
 #include <MidiUsbSender.h>
 
-MidiUsbSender::MidiUsbSender(Fifo_writeElementFunc<UsbMidiEventPacket> writeFunc) :
+MidiUsbSender::MidiUsbSender(Fifo_writeElementFunc<WriteFunctionParamT> writeFunc) :
 	fifo(buf, MidiUsbSender_BUF_LEN, writeFunc)
 {
 

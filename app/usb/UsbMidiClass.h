@@ -1,13 +1,9 @@
 /**
   ******************************************************************************
   * @file    UsbMidiClass.h
-  * @author  MCD Application Team
+  * @author  apaluch
   * @brief   header file for the UsbMidiClass.c file.
   ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2015 STMicroelectronics.
-  * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
   * SLA0044, the "License"; You may not use this file except in compliance with
@@ -16,34 +12,17 @@
   *
   ******************************************************************************
   */
-
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USB_MIDI_H
-#define __USB_MIDI_H
+#ifndef __USB_MIDI_CLASS_H__
+#define __USB_MIDI_CLASS_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Includes ------------------------------------------------------------------*/
 #include  "usbd_ioreq.h"
 
-/** @addtogroup STM32_USB_DEVICE_LIBRARY
-  * @{
-  */
-
-/** @defgroup UsbMidiClass
-  * @brief This file is the Header file for UsbMidiClass.c
-  * @{
-  */
-
-
-/** @defgroup UsbMidiClass_Exported_Defines
-  * @{
-  */
 #define MIDI_IN_EP                                   0x81U  /* EP1 for data IN */
 #define MIDI_OUT_EP                                  0x01U  /* EP1 for data OUT */
-#define MIDI_CMD_EP                                  0x82U  /* EP2 for MIDI commands */
 
 #ifndef MIDI_HS_BINTERVAL
 #define MIDI_HS_BINTERVAL                          0x10U
@@ -56,7 +35,6 @@ extern "C" {
 /* MIDI Endpoints parameters: you can fine tune these values depending on the needed baudrates and performance. */
 #define MIDI_DATA_HS_MAX_PACKET_SIZE                 512U  /* Endpoint IN & OUT Packet size */
 #define MIDI_DATA_FS_MAX_PACKET_SIZE                 64U  /* Endpoint IN & OUT Packet size */
-#define MIDI_CMD_PACKET_SIZE                         8U  /* Control Endpoint Packet size */
 
 #define USB_MIDI_CONFIG_DESC_SIZ                     101U
 #define MIDI_DATA_HS_IN_PACKET_SIZE                  MIDI_DATA_HS_MAX_PACKET_SIZE
@@ -65,31 +43,7 @@ extern "C" {
 #define MIDI_DATA_FS_IN_PACKET_SIZE                  MIDI_DATA_FS_MAX_PACKET_SIZE
 #define MIDI_DATA_FS_OUT_PACKET_SIZE                 MIDI_DATA_FS_MAX_PACKET_SIZE
 
-/*---------------------------------------------------------------------*/
-/*  MIDI definitions                                                    */
-/*---------------------------------------------------------------------*/
-#define MIDI_SEND_ENCAPSULATED_COMMAND               0x00U
-#define MIDI_GET_ENCAPSULATED_RESPONSE               0x01U
-#define MIDI_SET_COMM_FEATURE                        0x02U
-#define MIDI_GET_COMM_FEATURE                        0x03U
-#define MIDI_CLEAR_COMM_FEATURE                      0x04U
-#define MIDI_SET_LINE_CODING                         0x20U
-#define MIDI_GET_LINE_CODING                         0x21U
-#define MIDI_SET_CONTROL_LINE_STATE                  0x22U
-#define MIDI_SEND_BREAK                              0x23U
 
-/**
-  * @}
-  */
-
-
-/** @defgroup USBD_CORE_Exported_TypesDefinitions
-  * @{
-  */
-
-/**
-  * @}
-  */
 typedef struct
 {
   uint32_t bitrate;
@@ -124,28 +78,9 @@ typedef struct
 UsbMidiClass_HandleTypeDef;
 
 
-
-/** @defgroup USBD_CORE_Exported_Macros
-  * @{
-  */
-
-/**
-  * @}
-  */
-
-/** @defgroup USBD_CORE_Exported_Variables
-  * @{
-  */
-
 extern USBD_ClassTypeDef  UsbMidiClass;
 #define UsbMidiClass_CLASS    &UsbMidiClass
-/**
-  * @}
-  */
 
-/** @defgroup USB_CORE_Exported_Functions
-  * @{
-  */
 uint8_t  UsbMidiClass_registerInterface(USBD_HandleTypeDef   *pdev,
                                     UsbMidiClass_ItfTypeDef *fops);
 
@@ -159,21 +94,9 @@ uint8_t  UsbMidiClass_SetRxBuffer(USBD_HandleTypeDef   *pdev,
 uint8_t  UsbMidiClass_ReceivePacket(USBD_HandleTypeDef *pdev);
 
 uint8_t  UsbMidiClass_TransmitPacket(USBD_HandleTypeDef *pdev);
-/**
-  * @}
-  */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  /* __USB_MIDI_H */
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+#endif  /* __USB_MIDI_CLASS_H__ */

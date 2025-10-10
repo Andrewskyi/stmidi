@@ -17,7 +17,8 @@
 
 class MidiUsbSender : public MidiSender {
 public:
-	MidiUsbSender(Fifo_writeElementFunc<UsbMidiEventPacket> writeFunc);
+	using WriteFunctionParamT = UsbMidiEventPacket&;
+	MidiUsbSender(Fifo_writeElementFunc<WriteFunctionParamT> writeFunc);
 	virtual ~MidiUsbSender();
 
 	virtual bool sendMidi(const MidiEvent& midiEvent);
@@ -26,7 +27,7 @@ public:
 	void tick();
 private:
 	UsbMidiEventPacket buf[MidiUsbSender_BUF_LEN];
-    Fifo<UsbMidiEventPacket> fifo;
+    Fifo<UsbMidiEventPacket, WriteFunctionParamT> fifo;
 
 	UsbMidiEventPacket midiToUSB(uint8_t virtualCable, const uint8_t *midiMsg, uint8_t length);
 };

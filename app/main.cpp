@@ -6,11 +6,11 @@
 #include <MidiSerialSender.h>
 #include <MidiUsbReceiver.h>
 
-SystemOut sysOut(usart1send);
+SystemOut sysOut(&usart1send);
 
 // serial to USB
 MidiUsbSender usbMidiSender(&sendUsbMidi);
-MidiSerialReceiver midiSerialReceiver(&usbMidiSender);
+MidiSerialReceiver midiSerialReceiver(usbMidiSender);
 
 // USB to serial
 MidiSerialSender midiSerialSender(&usart2send);

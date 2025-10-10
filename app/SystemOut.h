@@ -32,14 +32,14 @@ SOFTWARE.
 
 #include <Fifo.h>
 
-#define SystemOut_BUFFER_LENGTH 128
+#define SystemOut_BUFFER_LENGTH 64
 
-class SystemOut : public Fifo<char> {
+class SystemOut : public Fifo<uint8_t> {
 public:
-	SystemOut(Fifo_writeElementFunc<char> sendFunc);
+	SystemOut(Fifo_writeElementFunc<uint8_t> sendFunc);
 	virtual ~SystemOut();
 private:
-	char buffer[SystemOut_BUFFER_LENGTH];
+	uint8_t buffer[SystemOut_BUFFER_LENGTH];
 };
 
 #endif /* _SYSTEM_OUT_H_ */

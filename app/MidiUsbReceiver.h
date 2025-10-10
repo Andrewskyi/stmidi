@@ -1,5 +1,5 @@
 /*
- * MidiReceiver.h
+ * MidiUsbReceiver.h
  *
  *  Created on: 04.01.2020
  *      Author: apaluch
@@ -44,10 +44,10 @@ public:
 	MidiUsbReceiver(MidiSender& midiThru);
 	virtual ~MidiUsbReceiver();
 
-	// safe function may be invoked in interrupt context
+	// function may be invoked in interrupt context
 	bool newUsbEvent(const UsbMidiEventPacket& packet);
 
-	// unsafe function, called in main loop
+	// function, called in main loop
 	void tick();
 private:
 	SafeFifo<UsbMidiEventPacket> inputFifo;

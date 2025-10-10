@@ -10,7 +10,7 @@ extern SystemOut sysOut;
 extern MidiUsbReceiver midiUsbReceiver;
 extern MidiSerialReceiver midiSerialReceiver;
 
-bool usart1send(char b)
+bool usart1send(uint8_t b)
 {
 	if((USART1->SR & USART_SR_TXE) == 0)
 	{
@@ -22,11 +22,11 @@ bool usart1send(char b)
 	return true;
 }
 
-bool usart1rec(char* b)
+bool usart1rec(uint8_t& b)
 {
 	if((USART1->SR & USART_SR_RXNE) != 0)
 	{
-		*b = (uint8_t)(USART1->DR & 0xFF);
+		b = (uint8_t)(USART1->DR & 0xFF);
 
 		return true;
 	}
@@ -72,10 +72,10 @@ extern "C"
 void sysOutSend(char *buf, uint32_t length)
 {
 	// yes sometimes buffer could be overloaded, it is for debug only, so it don't need to be very reliable
-	sysOut.write(buf, length);
+	sysOut.write((uint8_t*)buf, length);
 }
 
-bool sendUsbMidi(UsbMidiEventPacket package)
+bool sendUsbMidi(UsbMidiEventPacket& package)
 {
 	return ( USBD_OK == MIDI_Transmit_FS(package.bytes, 4) );
 }
