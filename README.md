@@ -1,7 +1,7 @@
 ![stmidi](img/stmidi_small.jpg)
 
 # stmidi
-USB MIDI to serial converter. Each MIDI event received via USB is translated and sent to USART2, and each MIDI event from USART2 is sent to USB.
+USB MIDI to serial converter. Each MIDI event received via USB is translated and sent to USART2, and each MIDI event from USART2 is sent to USB. Each event is sent to the user application (currently, the user application does nothing except copy and translate events).
 
 # how code was developed
 
