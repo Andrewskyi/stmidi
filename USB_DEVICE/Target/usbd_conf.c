@@ -16,6 +16,7 @@
   *
   ******************************************************************************
   */
+#if 0
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -26,6 +27,15 @@
 #include "usbd_cdc.h"
 
 /* USER CODE BEGIN Includes */
+#endif
+
+#include "stm32f1xx.h"
+#include "stm32f1xx_hal.h"
+#include "usbd_def.h"
+#include "usbd_core.h"
+#include <usb/UsbMidiClass.h>
+
+#define USBD_CDC_HandleTypeDef UsbMidiClass_HandleTypeDef
 
 /* USER CODE END Includes */
 
@@ -335,7 +345,7 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
   /* USER CODE BEGIN EndPoint_Configuration_CDC */
   HAL_PCDEx_PMAConfig((PCD_HandleTypeDef*)pdev->pData , 0x81 , PCD_SNG_BUF, 0xC0);
   HAL_PCDEx_PMAConfig((PCD_HandleTypeDef*)pdev->pData , 0x01 , PCD_SNG_BUF, 0x110);
-  HAL_PCDEx_PMAConfig((PCD_HandleTypeDef*)pdev->pData , 0x82 , PCD_SNG_BUF, 0x100);
+  //HAL_PCDEx_PMAConfig((PCD_HandleTypeDef*)pdev->pData , 0x82 , PCD_SNG_BUF, 0x100);
   /* USER CODE END EndPoint_Configuration_CDC */
   return USBD_OK;
 }
