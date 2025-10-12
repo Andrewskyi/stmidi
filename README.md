@@ -1,5 +1,4 @@
-# NOTE YET READY
-# WORK IN PROGRESS...
+![stmidi](stmidi_small.jpg)
 
 # stmidi
 USB MIDI to serial converter
