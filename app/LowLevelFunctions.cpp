@@ -1,5 +1,4 @@
 /*
- * TxFifo.h
  *
  *  Created on: 2025
  *      Author: apaluch
@@ -39,16 +38,16 @@ extern SystemOut sysOut;
 extern MidiUsbReceiver midiUsbReceiver;
 extern MidiSerialReceiver midiSerialReceiver;
 
-bool usart1send(uint8_t b)
+uint32_t usart1send(const uint8_t* b, uint32_t len)
 {
 	if((USART1->SR & USART_SR_TXE) == 0)
 	{
-		return false;
+		return 0;
 	}
 
-	USART1->DR = (uint8_t)b;
+	USART1->DR = (uint8_t)(*b);
 
-	return true;
+	return 1;
 }
 
 bool usart1rec(uint8_t& b)
@@ -75,16 +74,16 @@ bool usart2rec(uint8_t& b)
 	return false;
 }
 
-bool usart2send(uint8_t b)
+uint32_t usart2send(const uint8_t* b, uint32_t len)
 {
 	if((USART2->SR & USART_SR_TXE) == 0)
 	{
-		return false;
+		return 0;
 	}
 
-	USART2->DR = (uint8_t)b;
+	USART2->DR = (uint8_t)(*b);
 
-	return true;
+	return 1;
 }
 
 extern "C"
@@ -104,9 +103,21 @@ void sysOutSend(char *buf, uint32_t length)
 	sysOut.write((uint8_t*)buf, length);
 }
 
-bool sendUsbMidi(UsbMidiEventPacket& package)
+uint32_t sendUsbMidi(const UsbMidiEventPacket* packet, uint32_t len)
 {
-	return ( USBD_OK == MIDI_Transmit_FS(package.bytes, 4) );
+	if(MIDI_TransmitterState() != USBD_OK) {
+		return 0;
+	}
+
+	//APP_TX_DATA_SIZE  1024
+
+	//extern uint8_t MidiTxBufferFS
+
+	for(uint32_t i=0; i<4; i++) {
+		MidiTxBufferFS[i] = packet->bytes[i];
+	}
+
+	return ( USBD_OK == MIDI_Transmit_FS(MidiTxBufferFS, 4) ) ? 1 : 0;
 }
 
 extern "C"
@@ -128,3 +139,17 @@ void newUsbMidiData(uint8_t* buf, uint32_t len)
 	}
 }
 
+void setOutLed(bool on)
+{
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, on ? GPIO_PIN_SET : GPIO_PIN_RESET);
+}
+
+void setInLed(bool on)
+{
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, on ? GPIO_PIN_SET : GPIO_PIN_RESET);
+}
+
+void setOverflowLed(bool on)
+{
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11, on ? GPIO_PIN_SET : GPIO_PIN_RESET);
+}

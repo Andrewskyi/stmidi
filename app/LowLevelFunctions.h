@@ -1,5 +1,4 @@
 /*
- * TxFifo.h
  *
  *  Created on: 2025
  *      Author: apaluch
@@ -33,15 +32,20 @@ SOFTWARE.
 #include <MidiUsbSender.h>
 #include <stdint.h>
 
-bool usart1send(uint8_t b);
+uint32_t usart1send(const uint8_t* b, uint32_t len);
 
 bool usart1rec(uint8_t& b);
 
 bool usart2rec(uint8_t& b);
 
-bool usart2send(uint8_t b);
+uint32_t usart2send(const uint8_t* b, uint32_t len);
 
-bool sendUsbMidi(UsbMidiEventPacket& package);
+uint32_t sendUsbMidi(const UsbMidiEventPacket* packet, uint32_t len);
 
+void setOutLed(bool on);
+
+void setInLed(bool on);
+
+void setOverflowLed(bool on);
 
 #endif /* LOWLEVELFUNCTIONS_H_ */

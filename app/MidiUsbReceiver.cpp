@@ -1,5 +1,5 @@
 /*
- * TxFifo.h
+ * 
  *
  *  Created on: 2025
  *      Author: apaluch
@@ -30,7 +30,8 @@ SOFTWARE.
 #include <MidiUsbReceiver.h>
 
 MidiUsbReceiver::MidiUsbReceiver(MidiSender& midiThru) :
-    inputFifo(buf, MidiUsbReceiver_BUF_LEN), midiThru(midiThru)
+    inputFifo(buf, MidiUsbReceiver_BUF_LEN), midiThru(midiThru),
+	overflow(inputFifo.overflow)
 {
 
 }
@@ -45,7 +46,7 @@ bool MidiUsbReceiver::newUsbEvent(const UsbMidiEventPacket& packet)
 	return inputFifo.write(packet);
 }
 
-void MidiUsbReceiver::tick()
+bool MidiUsbReceiver::nextEvent()
 {
 	if(inputFifo.peek(packet)) {
 		midiEvent.event.len = serialMidiLength(0x0F & packet.bytes[0] /*cin*/);
@@ -53,7 +54,11 @@ void MidiUsbReceiver::tick()
 		if( midiThru.sendMidi(midiEvent.event) ) {
 			inputFifo.skeep();
 		}
+
+		return true;
 	}
+
+	return false;
 }
 
 uint8_t MidiUsbReceiver::serialMidiLength(uint8_t cin)

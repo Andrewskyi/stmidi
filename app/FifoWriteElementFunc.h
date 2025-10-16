@@ -1,5 +1,5 @@
 /*
- * TxFifo.h
+ * 
  *
  *  Created on: 2025
  *      Author: apaluch
@@ -30,7 +30,12 @@ SOFTWARE.
 #ifndef FIFOWRITEELEMENTFUNC_H_
 #define FIFOWRITEELEMENTFUNC_H_
 
+#include <stdint.h>
+
 template <typename T>
 using Fifo_writeElementFunc = bool(*)(T element);
+
+template <typename T>
+using Fifo_writeFewElementsFunc = uint32_t(*)(const T* element, uint32_t len);
 
 #endif /* FIFOWRITEELEMENTFUNC_H_ */

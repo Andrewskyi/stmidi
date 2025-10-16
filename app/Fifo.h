@@ -1,5 +1,5 @@
 /*
- * TxFifo.h
+ * 
  *
  *  Created on: 2025
  *      Author: apaluch
@@ -38,18 +38,19 @@ class Fifo {
 public:
 	volatile const bool& overflow;
 
-	Fifo(T*const buf, const uint32_t length, Fifo_writeElementFunc<WriteFuncParamT> writeFunc);
+	Fifo(T*const buf, const uint32_t length, Fifo_writeFewElementsFunc<WriteFuncParamT> writeFunc);
 	virtual ~Fifo();
 
 	bool write(const T* buf, uint32_t length);
 	void tick();
 protected:
-	Fifo_writeElementFunc<WriteFuncParamT> writeFunc;
+	Fifo_writeFewElementsFunc<WriteFuncParamT> writeFunc;
 private:
 	T*const queue;
 	const uint32_t FIFO_LENGTH;
 	volatile uint32_t writePos;
 	volatile uint32_t readPos;
+	void consumeElements();
 protected:
 	volatile uint32_t fifoLen;
 private:
@@ -57,9 +58,9 @@ private:
 };
 
 template <typename T, typename WriteFuncParamT>
-Fifo<T, WriteFuncParamT>::Fifo(T*const buf, const uint32_t length, Fifo_writeElementFunc<WriteFuncParamT> writeFuncParam) :
+Fifo<T, WriteFuncParamT>::Fifo(T*const buf, const uint32_t length, Fifo_writeFewElementsFunc<WriteFuncParamT> writeFunc) :
         overflow(_overflow),
-		writeFunc(writeFuncParam),
+		writeFunc(writeFunc),
 		queue(buf), FIFO_LENGTH(length),
 		writePos(0), readPos(0), fifoLen(0) {
 
@@ -98,12 +99,12 @@ bool Fifo<T, WriteFuncParamT>::write(const T* buf, uint32_t length) {
 }
 
 template <typename T, typename WriteFuncParamT>
-void Fifo<T, WriteFuncParamT>::tick() {
+void Fifo<T, WriteFuncParamT>::consumeElements() {
 	if (fifoLen == 0) {
 		return;
 	}
 
-	if (writeFunc(queue[readPos])) {
+	if (writeFunc(&( queue[readPos]), 1) ) {
 		if (readPos < (FIFO_LENGTH - 1)) {
 			readPos++;
 		} else {
@@ -112,6 +113,11 @@ void Fifo<T, WriteFuncParamT>::tick() {
 
 		fifoLen--;
 	}
+}
+
+template <typename T, typename WriteFuncParamT>
+void Fifo<T, WriteFuncParamT>::tick() {
+	consumeElements();
 }
 
 #endif /* __FIFO_H_ */

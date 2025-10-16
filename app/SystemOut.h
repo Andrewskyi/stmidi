@@ -36,7 +36,7 @@ SOFTWARE.
 
 class SystemOut : public Fifo<uint8_t> {
 public:
-	SystemOut(Fifo_writeElementFunc<uint8_t> sendFunc);
+	SystemOut(Fifo_writeFewElementsFunc<uint8_t> sendFunc);
 	virtual ~SystemOut();
 private:
 	uint8_t buffer[SystemOut_BUFFER_LENGTH];

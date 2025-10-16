@@ -1,5 +1,5 @@
 /*
- * TxFifo.h
+ * 
  *
  *  Created on: 2025
  *      Author: apaluch
@@ -29,8 +29,9 @@ SOFTWARE.
 
 #include <MidiUsbSender.h>
 
-MidiUsbSender::MidiUsbSender(Fifo_writeElementFunc<WriteFunctionParamT> writeFunc) :
-	fifo(buf, MidiUsbSender_BUF_LEN, writeFunc)
+MidiUsbSender::MidiUsbSender(Fifo_writeFewElementsFunc<WriteFunctionParamT> writeFunc) :
+	fifo(buf, MidiUsbSender_BUF_LEN, writeFunc),
+	overflow(fifo.overflow)
 {
 
 }

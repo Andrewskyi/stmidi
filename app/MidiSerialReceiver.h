@@ -1,5 +1,5 @@
 /*
- * TxFifo.h
+ * 
  *
  *  Created on: 2025
  *      Author: apaluch
@@ -43,7 +43,7 @@ public:
 	virtual ~MidiSerialReceiver();
 
 	void newUartByte(uint8_t b);
-	void tick();
+	bool nextEvent();
 private:
 	MidiEvent midiEvent;
 	bool midiEventPending;
@@ -54,8 +54,9 @@ private:
 	volatile uint8_t runningStatusByte;
 	volatile uint32_t expectedBytesCount;
 
-	void nextEvent();
 	uint32_t expectedChannelVoiceMsgBytesCount();
+public:
+	volatile const bool& overflow;
 };
 
 #endif /* MIDISERIALRECEIVER_H_ */

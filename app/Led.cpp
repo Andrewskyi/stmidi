@@ -1,5 +1,4 @@
 /*
- * 
  *
  *  Created on: 2025
  *      Author: apaluch
@@ -27,30 +26,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <stdint.h>
-#include <Fifo.h>
-#include <MidiSender.h>
+#include <Led.h>
 
-#ifndef MIDISERIALSENDER_H_
-#define MIDISERIALSENDER_H_
+Led::~Led() {
+}
 
-#define MidiSerialSender_BUF_LEN 2048
+Led::Led(Led_setStateFunc func, uint32_t duration) : duration(duration), state(0), func(func)
+{
 
-class MidiSerialSender : public MidiSender {
-public:
-	MidiSerialSender(Fifo_writeFewElementsFunc<uint8_t> writeFunc);
-	virtual ~MidiSerialSender(){}
+}
 
-	virtual bool sendMidi(const MidiEvent& midiEvent);
-	virtual bool sendRealTimeMidi(uint8_t b);
+void Led::trigger()
+{
+	func(true);
+	state = 0;
+}
 
-	void tick();
-private:
-	uint8_t buf[MidiSerialSender_BUF_LEN];
-    Fifo<uint8_t> fifo;
-    uint8_t runningStatus;
-public:
-	volatile const bool& overflow;
-};
+void Led::tick()
+{
+   if(state < duration) {
+	   state++;
+   }
 
-#endif /* MIDISERIALSENDER_H_ */
+   if(state == (duration - 1)) {
+	   func(false);
+   }
+}

@@ -1,5 +1,5 @@
 /*
- * TxFifo.h
+ * 
  *
  *  Created on: 2025
  *      Author: apaluch
@@ -48,7 +48,7 @@ public:
 	bool newUsbEvent(const UsbMidiEventPacket& packet);
 
 	// function, called in main loop
-	void tick();
+	bool nextEvent();
 private:
 	SafeFifo<UsbMidiEventPacket> inputFifo;
 	MidiSender& midiThru;
@@ -62,6 +62,8 @@ private:
 	  MidiEventWithUsbHeader midiEvent;
 	};
 	uint8_t serialMidiLength(uint8_t cin);
+public:
+	volatile const bool& overflow;
 };
 
 #endif /* MIDIUSBRECEIVER_H_ */

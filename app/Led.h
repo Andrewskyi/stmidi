@@ -1,5 +1,4 @@
 /*
- * 
  *
  *  Created on: 2025
  *      Author: apaluch
@@ -27,30 +26,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#ifndef LED_H_
+#define LED_H_
+
 #include <stdint.h>
-#include <Fifo.h>
-#include <MidiSender.h>
 
-#ifndef MIDISERIALSENDER_H_
-#define MIDISERIALSENDER_H_
+using Led_setStateFunc = void(*)(bool on);
 
-#define MidiSerialSender_BUF_LEN 2048
-
-class MidiSerialSender : public MidiSender {
+class Led {
 public:
-	MidiSerialSender(Fifo_writeFewElementsFunc<uint8_t> writeFunc);
-	virtual ~MidiSerialSender(){}
-
-	virtual bool sendMidi(const MidiEvent& midiEvent);
-	virtual bool sendRealTimeMidi(uint8_t b);
-
+	virtual ~Led();
+	Led(Led_setStateFunc func, uint32_t duration);
+	void trigger();
 	void tick();
 private:
-	uint8_t buf[MidiSerialSender_BUF_LEN];
-    Fifo<uint8_t> fifo;
-    uint8_t runningStatus;
-public:
-	volatile const bool& overflow;
+	const uint32_t duration;
+	volatile uint32_t state;
+	Led_setStateFunc func;
 };
 
-#endif /* MIDISERIALSENDER_H_ */
+#endif /* LED_H_ */

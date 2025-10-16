@@ -1,5 +1,5 @@
 /*
- * TxFifo.h
+ * 
  *
  *  Created on: 2025
  *      Author: apaluch
@@ -40,8 +40,8 @@ SOFTWARE.
 
 class MidiUsbSender : public MidiSender {
 public:
-	using WriteFunctionParamT = UsbMidiEventPacket&;
-	MidiUsbSender(Fifo_writeElementFunc<WriteFunctionParamT> writeFunc);
+	using WriteFunctionParamT = UsbMidiEventPacket;
+	MidiUsbSender(Fifo_writeFewElementsFunc<WriteFunctionParamT> writeFunc);
 	virtual ~MidiUsbSender();
 
 	virtual bool sendMidi(const MidiEvent& midiEvent);
@@ -53,6 +53,8 @@ private:
     Fifo<UsbMidiEventPacket, WriteFunctionParamT> fifo;
 
 	UsbMidiEventPacket midiToUSB(uint8_t virtualCable, const uint8_t *midiMsg, uint8_t length);
+public:
+	volatile const bool& overflow;
 };
 
 #endif /* USBMIDISENDER_H_ */

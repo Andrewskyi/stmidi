@@ -1,6 +1,4 @@
 /*
- * TxFifo.h
- *
  *  Created on: 2025
  *      Author: apaluch
  *
@@ -34,6 +32,9 @@ SOFTWARE.
 #include <MidiUsbSender.h>
 #include <MidiSerialSender.h>
 #include <MidiUsbReceiver.h>
+#include <Led.h>
+
+#define LED_PULSE_DURATION 2000
 
 SystemOut sysOut(&usart1send);
 
@@ -45,19 +46,45 @@ MidiSerialReceiver midiSerialReceiver(usbMidiSender);
 MidiSerialSender midiSerialSender(&usart2send);
 MidiUsbReceiver midiUsbReceiver(midiSerialSender);
 
+// leds
+Led ledIn(&setInLed, LED_PULSE_DURATION);
+Led ledOut(&setOutLed, LED_PULSE_DURATION);
+
 extern "C" int appMain(void)
 {
+	volatile bool lastOverflow = false;
+
 	while(true)
 	{
 		// serial to USB
 		usbMidiSender.tick();
-		midiSerialReceiver.tick();
+
+		if(midiSerialReceiver.nextEvent()) {
+			ledIn.trigger();
+		}
 
 		// USB to serial
 		midiSerialSender.tick();
-		midiUsbReceiver.tick();
+
+		if(midiUsbReceiver.nextEvent()) {
+			ledOut.trigger();
+		}
+
+		// overflow indication
+		volatile bool currentOverflow = usbMidiSender.overflow || midiSerialReceiver.overflow ||
+				midiSerialSender.overflow || midiUsbReceiver.overflow;
+
+		if(!lastOverflow && currentOverflow) {
+			setOverflowLed(true);
+		} else if(lastOverflow && !currentOverflow) {
+			setOverflowLed(false);
+		}
+
+		lastOverflow = currentOverflow;
 
 		// stdout
 		sysOut.tick();
+		ledIn.tick();
+		ledOut.tick();
 	}
 }

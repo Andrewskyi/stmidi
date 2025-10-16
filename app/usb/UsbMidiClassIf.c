@@ -104,6 +104,17 @@ static int8_t UsbMidiClass_Receive_FS(uint8_t* Buf, uint32_t *Len)
   return (USBD_OK);
 }
 
+uint8_t MIDI_TransmitterState()
+{
+	UsbMidiClass_HandleTypeDef *hmidi = (UsbMidiClass_HandleTypeDef*)hUsbDeviceFS.pClassData;
+
+	if (hmidi->TxState != 0){
+		return USBD_BUSY;
+	}
+
+	return USBD_OK;
+}
+
 /**
   * @brief  MIDI_Transmit_FS
   *         Data to send over USB IN endpoint are sent over MIDI interface

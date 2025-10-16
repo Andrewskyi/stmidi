@@ -26,11 +26,15 @@
 #define APP_RX_DATA_SIZE  1024
 #define APP_TX_DATA_SIZE  1024
 
+extern uint8_t MidiTxBufferFS[];
+
 /** MIDI Interface callback. */
 extern UsbMidiClass_ItfTypeDef UsbMidiClass_Interface_fops_FS;
 
+uint8_t MIDI_TransmitterState();
 
 uint8_t MIDI_Transmit_FS(uint8_t* Buf, uint16_t Len);
+
 
 #ifdef __cplusplus
 }

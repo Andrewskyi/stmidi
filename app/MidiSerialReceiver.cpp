@@ -1,5 +1,5 @@
 /*
- * TxFifo.h
+ * 
  *
  *  Created on: 2025
  *      Author: apaluch
@@ -32,7 +32,8 @@ SOFTWARE.
 
 MidiSerialReceiver::MidiSerialReceiver(MidiSender& midiThru) :
   midiEventPending(false), runtimeEventPending(0),
-  fifo(buf, MidiSerialReceiver_BUF_LEN), midiThru(midiThru), runningStatusByte(0)
+  fifo(buf, MidiSerialReceiver_BUF_LEN), midiThru(midiThru), runningStatusByte(0),
+  overflow(fifo.overflow)
 {
 	midiEvent.len = 0;
 }
@@ -44,13 +45,13 @@ void MidiSerialReceiver::newUartByte(uint8_t b) {
 	fifo.write(b);
 }
 
-void MidiSerialReceiver::nextEvent() {
+bool MidiSerialReceiver::nextEvent() {
 	// try to send runtime event if pending
 	if(runtimeEventPending) {
 		if(midiThru.sendRealTimeMidi(runtimeEventPending)) {
 		  runtimeEventPending = 0;
 		} else {
-		  return;
+		  return false;
 		}
 	}
 
@@ -60,6 +61,7 @@ void MidiSerialReceiver::nextEvent() {
 	}
 
 	uint8_t b;
+	bool newEventReceived = false;
 
 	if (!midiEventPending && fifo.read(b)) {
 		// Channel Voice Message Header
@@ -100,6 +102,8 @@ void MidiSerialReceiver::nextEvent() {
 		}
 		// System Real-Time Message Header
 		else if (b >= 0xF8) {
+			newEventReceived = true;
+
 			if(!midiThru.sendRealTimeMidi(b)) {
 				runtimeEventPending = b;
 			}
@@ -115,6 +119,7 @@ void MidiSerialReceiver::nextEvent() {
 				midiEvent.buf[0] = runningStatusByte;
 			}
 
+			newEventReceived = true;
 			midiEventPending = !midiThru.sendMidi(midiEvent);
 
 			if (runningStatusByte > 0) {
@@ -126,10 +131,8 @@ void MidiSerialReceiver::nextEvent() {
 			}
 		}
 	}
-}
 
-void MidiSerialReceiver::tick() {
-	nextEvent();
+	return newEventReceived;
 }
 
 uint32_t MidiSerialReceiver::expectedChannelVoiceMsgBytesCount() {
