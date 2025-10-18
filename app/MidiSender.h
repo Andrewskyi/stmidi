@@ -37,8 +37,8 @@ class MidiSender
 public:
 	virtual ~MidiSender(){}
 
-	virtual bool sendMidi(const MidiEvent& midiEvent);
-	virtual bool sendRealTimeMidi(uint8_t b);
+	virtual bool sendMidi(const MidiEvent& midiEvent) = 0;
+	virtual bool sendRealTimeMidi(uint8_t b) = 0;
 };
 
 #endif /* MIDISENDER_H_ */

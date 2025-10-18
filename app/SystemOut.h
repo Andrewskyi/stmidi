@@ -34,9 +34,9 @@ SOFTWARE.
 
 #define SystemOut_BUFFER_LENGTH 64
 
-class SystemOut : public Fifo<uint8_t> {
+class SystemOut : public Fifo<uint8_t, Fifo_writeElementFunc<uint8_t> > {
 public:
-	SystemOut(Fifo_writeFewElementsFunc<uint8_t> sendFunc);
+	SystemOut(Fifo_writeElementFunc<uint8_t> sendFunc);
 	virtual ~SystemOut();
 private:
 	uint8_t buffer[SystemOut_BUFFER_LENGTH];

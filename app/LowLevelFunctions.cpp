@@ -38,16 +38,16 @@ extern SystemOut sysOut;
 extern MidiUsbReceiver midiUsbReceiver;
 extern MidiSerialReceiver midiSerialReceiver;
 
-uint32_t usart1send(const uint8_t* b, uint32_t len)
+bool usart1send(uint8_t b)
 {
 	if((USART1->SR & USART_SR_TXE) == 0)
 	{
-		return 0;
+		return false;
 	}
 
-	USART1->DR = (uint8_t)(*b);
+	USART1->DR = b;
 
-	return 1;
+	return true;
 }
 
 bool usart1rec(uint8_t& b)
@@ -74,16 +74,16 @@ bool usart2rec(uint8_t& b)
 	return false;
 }
 
-uint32_t usart2send(const uint8_t* b, uint32_t len)
+bool usart2send(uint8_t b)
 {
 	if((USART2->SR & USART_SR_TXE) == 0)
 	{
-		return 0;
+		return false;
 	}
 
-	USART2->DR = (uint8_t)(*b);
+	USART2->DR = b;
 
-	return 1;
+	return true;
 }
 
 extern "C"
@@ -141,15 +141,15 @@ void newUsbMidiData(uint8_t* buf, uint32_t len)
 
 void setOutLed(bool on)
 {
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, on ? GPIO_PIN_SET : GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, on ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
 void setInLed(bool on)
 {
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, on ? GPIO_PIN_SET : GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, on ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
 void setOverflowLed(bool on)
 {
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11, on ? GPIO_PIN_SET : GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, on ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }

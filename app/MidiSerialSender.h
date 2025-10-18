@@ -38,7 +38,7 @@ SOFTWARE.
 
 class MidiSerialSender : public MidiSender {
 public:
-	MidiSerialSender(Fifo_writeFewElementsFunc<uint8_t> writeFunc);
+	MidiSerialSender(Fifo_writeElementFunc<uint8_t> writeFunc);
 	virtual ~MidiSerialSender(){}
 
 	virtual bool sendMidi(const MidiEvent& midiEvent);
@@ -47,7 +47,7 @@ public:
 	void tick();
 private:
 	uint8_t buf[MidiSerialSender_BUF_LEN];
-    Fifo<uint8_t> fifo;
+    Fifo<uint8_t, Fifo_writeElementFunc<uint8_t>> fifo;
     uint8_t runningStatus;
 public:
 	volatile const bool& overflow;

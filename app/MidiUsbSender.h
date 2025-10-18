@@ -50,7 +50,7 @@ public:
 	void tick();
 private:
 	UsbMidiEventPacket buf[MidiUsbSender_BUF_LEN];
-    Fifo<UsbMidiEventPacket, WriteFunctionParamT> fifo;
+    Fifo<UsbMidiEventPacket> fifo;
 
 	UsbMidiEventPacket midiToUSB(uint8_t virtualCable, const uint8_t *midiMsg, uint8_t length);
 public:

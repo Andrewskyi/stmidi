@@ -32,13 +32,13 @@ SOFTWARE.
 #include <MidiUsbSender.h>
 #include <stdint.h>
 
-uint32_t usart1send(const uint8_t* b, uint32_t len);
+bool usart1send(uint8_t b);
 
 bool usart1rec(uint8_t& b);
 
 bool usart2rec(uint8_t& b);
 
-uint32_t usart2send(const uint8_t* b, uint32_t len);
+bool usart2send(uint8_t b);
 
 uint32_t sendUsbMidi(const UsbMidiEventPacket* packet, uint32_t len);
 

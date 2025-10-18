@@ -30,7 +30,7 @@ SOFTWARE.
 #include <MidiSerialSender.h>
 
 
-MidiSerialSender::MidiSerialSender(Fifo_writeFewElementsFunc<uint8_t> writeFunc) :
+MidiSerialSender::MidiSerialSender(Fifo_writeElementFunc<uint8_t> writeFunc) :
   fifo(buf, MidiSerialSender_BUF_LEN, writeFunc), runningStatus(0),
   overflow(fifo.overflow)
 {
