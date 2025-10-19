@@ -43,16 +43,16 @@ MidiUsbSender::~MidiUsbSender()
 
 bool MidiUsbSender::sendMidi(const MidiEvent& midiEvent)
 {
-	UsbMidiEventPacket package = midiToUSB(0, midiEvent.buf, midiEvent.len);
+	UsbMidiEventPacket packet = midiToUSB(0, midiEvent.buf, midiEvent.len);
 
-	return fifo.write(&package, 1);
+	return fifo.write(&packet, 1);
 }
 
 bool MidiUsbSender::sendRealTimeMidi(uint8_t b)
 {
-	UsbMidiEventPacket package = midiToUSB(0, &b, 1);
+	UsbMidiEventPacket packet = midiToUSB(0, &b, 1);
 
-	return fifo.write(&package, 1);
+	return fifo.write(&packet, 1);
 }
 
 void MidiUsbSender::tick()

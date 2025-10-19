@@ -5,19 +5,14 @@
 #include <memory.h>
 #include <algorithm>
 
+// just for IDE indexer
 #ifndef TEST_F
 #define TEST_F(x, y) struct x##y : public x { void something(); }; x##y::something()
 #endif
 
-
-
-uint32_t FifoTest_witeManyFunc(const uint8_t* buf, uint32_t len)
-{
-  return len;
-}
-
 std::vector<uint8_t> singleWriteElements;
 bool singleWriteRet = true;
+
 bool FifoTest_witeSingleFunc(uint8_t element)
 {
 	singleWriteElements.push_back(element);
@@ -28,7 +23,12 @@ class FifoWriteSingleTest : public ::testing::Test
 {
 protected:
 	FifoWriteSingleTest() : uut(buf, 5, FifoTest_witeSingleFunc){}
-	void SetUp(){}
+	void SetUp()
+	{
+		singleWriteElements.clear();
+		singleWriteRet = true;
+		memset(buf, 0, sizeof(buf));
+	}
 
 	uint8_t buf[5];
 	Fifo<uint8_t, Fifo_writeElementFunc<uint8_t> > uut;
@@ -37,10 +37,6 @@ protected:
 TEST_F(FifoWriteSingleTest, writingElements)
 {
 	uint8_t tmp[] = {1, 2, 3, 4, 5};
-
-	singleWriteElements.clear();
-	singleWriteRet = true;
-	memset(buf, 0, sizeof(buf));
 
 	// write 5 elements
 	EXPECT_TRUE( uut.write(&tmp[0], 1) );

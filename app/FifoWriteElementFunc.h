@@ -36,6 +36,6 @@ template <typename T>
 using Fifo_writeElementFunc = bool(*)(T element);
 
 template <typename T>
-using Fifo_writeFewElementsFunc = uint32_t(*)(const T* element, uint32_t len);
+using Fifo_writeFewElementsFunc = uint32_t(*)(const T* part1, uint32_t len1, const T* part2, uint32_t len2);
 
 #endif /* FIFOWRITEELEMENTFUNC_H_ */

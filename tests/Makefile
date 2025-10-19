@@ -5,7 +5,7 @@ GOOGLE_TEST_INCLUDE = /usr/local/include
 GOOGLE_TEST_LIB_DIR = /usr/src/gtest
 
 SOURCES = 
-TESTS = FifoTests.cpp
+TESTS = FifoSingleElementFuncTests.cpp FifoFewElementsFuncTests.cpp
 
 BUILD_DIR=obj
 SRC_DIR=app

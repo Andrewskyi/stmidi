@@ -40,7 +40,7 @@ bool usart2rec(uint8_t& b);
 
 bool usart2send(uint8_t b);
 
-uint32_t sendUsbMidi(const UsbMidiEventPacket* packet, uint32_t len);
+uint32_t sendUsbMidi(const UsbMidiEventPacket* part1, uint32_t len1, const UsbMidiEventPacket* part2, uint32_t len2);
 
 void setOutLed(bool on);
 

@@ -34,11 +34,6 @@ SOFTWARE.
 #include <FifoWriteElementFunc.h>
 #include <type_traits>
 
-template <typename T>
-using Fifo_writeElementFunc = bool(*)(T element);
-
-template <typename T>
-using Fifo_writeFewElementsFunc = uint32_t(*)(const T* element, uint32_t len);
 
 template <typename T, typename WriteFunc=Fifo_writeFewElementsFunc<T> >
 class Fifo {
@@ -119,16 +114,35 @@ void Fifo<T, WriteFunc>::consumeElements()
 		return;
 	}
 
-	const uint32_t consumed = writeFunc(&( queue[readPos]), 1);
+	uint32_t headLen = fifoLen;
+	uint32_t tailLen = 0;
+
+	// correct if buffer is rotated
+	if( (fifoLen > 0) && (readPos >= writePos) ) {
+		headLen = FIFO_LENGTH - readPos;
+		tailLen = fifoLen - headLen;
+	}
+
+	uint32_t consumed = 0;
+
+	if(tailLen == 0) {
+		consumed = writeFunc(&( queue[readPos]), headLen,  nullptr, 0);
+	} else {
+		consumed = writeFunc(&( queue[readPos]), headLen,  &( queue[0]), tailLen);
+	}
+
+	// fallback
+	if(consumed > fifoLen) {
+		consumed = fifoLen;
+	}
 
 	if (consumed > 0) {
-		if (readPos < (FIFO_LENGTH - 1)) {
-			readPos++;
-		} else {
-			readPos = 0;
-		}
+		fifoLen -= consumed;
+		readPos += consumed;
 
-		fifoLen--;
+		if (readPos >= FIFO_LENGTH) {
+			readPos -= FIFO_LENGTH;
+		}
 	}
 }
 

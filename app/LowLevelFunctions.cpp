@@ -103,18 +103,34 @@ void sysOutSend(char *buf, uint32_t length)
 	sysOut.write((uint8_t*)buf, length);
 }
 
-uint32_t sendUsbMidi(const UsbMidiEventPacket* packet, uint32_t len)
+uint32_t sendUsbMidi(const UsbMidiEventPacket* part1, uint32_t len1, const UsbMidiEventPacket* part2, uint32_t len2)
 {
 	if(MIDI_TransmitterState() != USBD_OK) {
 		return 0;
 	}
 
-	//APP_TX_DATA_SIZE  1024
+	uint32_t bytesNumTotal = 0;
 
-	//extern uint8_t MidiTxBufferFS
+	for(uint32_t p=0; p<len1; p++) {
+		if( (bytesNumTotal + 4) > APP_TX_DATA_SIZE ) {
+			break;
+		}
 
-	for(uint32_t i=0; i<4; i++) {
-		MidiTxBufferFS[i] = packet->bytes[i];
+		for(uint32_t i=0; i<4; i++) {
+			MidiTxBufferFS[bytesNumTotal] = part1[p].bytes[i];
+			bytesNumTotal++;
+		}
+	}
+
+	for(uint32_t p=0; p<len2; p++) {
+		if( (bytesNumTotal + 4) > APP_TX_DATA_SIZE ) {
+			break;
+		}
+
+		for(uint32_t i=0; i<4; i++) {
+			MidiTxBufferFS[bytesNumTotal] = part2[p].bytes[i];
+			bytesNumTotal++;
+		}
 	}
 
 	return ( USBD_OK == MIDI_Transmit_FS(MidiTxBufferFS, 4) ) ? 1 : 0;
