@@ -12,7 +12,7 @@ SRC_DIR=app
 TARGET=tests
 
 G++ = g++
-G++_FLAGS = -g -std=gnu++17 -c -Wall -I $(GOOGLE_TEST_INCLUDE) -I ../$(SRC_DIR)
+G++_FLAGS = -g -std=gnu++14 -c -Wall -I $(GOOGLE_TEST_INCLUDE) -I ../$(SRC_DIR)
 LD_FLAGS = -L $(GOOGLE_TEST_LIB_DIR) -l $(GOOGLE_TEST_LIB) -l pthread
 
 OBJECTS = \

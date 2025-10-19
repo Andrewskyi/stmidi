@@ -57,7 +57,13 @@ private:
 	const uint32_t FIFO_LENGTH;
 	volatile uint32_t writePos;
 	volatile uint32_t readPos;
+
+	template <typename U = WriteFunc, typename std::enable_if<std::is_same<U, Fifo_writeFewElementsFunc<T> >::value, int>::type = 0>
 	void consumeElements();
+
+	template <typename U = WriteFunc, typename std::enable_if<std::is_same<U, Fifo_writeElementFunc<T> >::value, int>::type = 0>
+	void consumeElements();
+
 protected:
 	volatile uint32_t fifoLen;
 private:
@@ -104,44 +110,46 @@ bool Fifo<T, WriteFunc>::write(const T* buf, uint32_t length) {
 	return false;
 }
 
+
 template <typename T, typename WriteFunc>
-void Fifo<T, WriteFunc>::consumeElements() {
+template <typename U, typename std::enable_if<std::is_same<U, Fifo_writeFewElementsFunc<T> >::value, int>::type>
+void Fifo<T, WriteFunc>::consumeElements()
+{
+	if (fifoLen == 0) {
+		return;
+	}
 
-	if constexpr (std::is_same_v<WriteFunc, Fifo_writeFewElementsFunc<T>>) {
-		if (fifoLen == 0) {
-			return;
+	const uint32_t consumed = writeFunc(&( queue[readPos]), 1);
+
+	if (consumed > 0) {
+		if (readPos < (FIFO_LENGTH - 1)) {
+			readPos++;
+		} else {
+			readPos = 0;
 		}
 
-		const uint32_t consumed = writeFunc(&( queue[readPos]), 1);
-
-		if (consumed > 0) {
-			if (readPos < (FIFO_LENGTH - 1)) {
-				readPos++;
-			} else {
-				readPos = 0;
-			}
-
-			fifoLen--;
-		}
-	} else if constexpr (std::is_same_v<WriteFunc, Fifo_writeElementFunc<T>>) {
-		if (fifoLen == 0) {
-			return;
-		}
-
-		if ( writeFunc(queue[readPos]) ) {
-			if (readPos < (FIFO_LENGTH - 1)) {
-				readPos++;
-			} else {
-				readPos = 0;
-			}
-
-			fifoLen--;
-		}
-	} else {
-        static_assert(false, "Unknown WriteFunc type");
-    }
+		fifoLen--;
+	}
 }
 
+template <typename T, typename WriteFunc>
+template <typename U, typename std::enable_if<std::is_same<U, Fifo_writeElementFunc<T> >::value, int>::type>
+void Fifo<T, WriteFunc>::consumeElements()
+{
+	if (fifoLen == 0) {
+		return;
+	}
+
+	if ( writeFunc(queue[readPos]) ) {
+		if (readPos < (FIFO_LENGTH - 1)) {
+			readPos++;
+		} else {
+			readPos = 0;
+		}
+
+		fifoLen--;
+	}
+}
 
 template <typename T, typename WriteFunc>
 void Fifo<T, WriteFunc>::tick() {
